@@ -5,14 +5,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
+
 	"github.com/axone-protocol/axone-sdk/auth"
 	"github.com/axone-protocol/axone-sdk/dataverse"
 	"github.com/axone-protocol/axone-sdk/keys"
-	"io"
 )
 
-const readAction = "read"
-const storeAction = "store"
+const (
+	readAction  = "read"
+	storeAction = "store"
+)
 
 type Proxy struct {
 	key       *keys.Key

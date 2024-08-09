@@ -2,8 +2,9 @@ package jwt
 
 import (
 	"fmt"
-	"github.com/axone-protocol/axone-sdk/auth"
 	"time"
+
+	"github.com/axone-protocol/axone-sdk/auth"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"

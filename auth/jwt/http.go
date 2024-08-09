@@ -3,9 +3,10 @@ package jwt
 import (
 	"context"
 	"errors"
-	"github.com/axone-protocol/axone-sdk/auth"
 	"io"
 	"net/http"
+
+	"github.com/axone-protocol/axone-sdk/auth"
 )
 
 func (f *Factory) HTTPAuthHandler(proxy auth.Proxy) http.Handler {

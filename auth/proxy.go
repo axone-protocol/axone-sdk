@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+
 	"github.com/axone-protocol/axone-sdk/dataverse"
 )
 

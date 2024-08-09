@@ -1,8 +1,9 @@
 package http
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type Server struct {
@@ -20,9 +21,7 @@ func NewServer(addr string, opts ...Option) *Server {
 		router: router,
 	}
 
-	for _, opt := range opts {
-		opt(s)
-	}
+	WithOptions(opts...)(s)
 
 	return s
 }
