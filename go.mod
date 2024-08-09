@@ -8,6 +8,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
+	go.uber.org/mock v0.4.0
 )
 
 // Use cutom fork of prolog interpreter, only needed to build

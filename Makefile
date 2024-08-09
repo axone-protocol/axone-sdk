@@ -75,7 +75,9 @@ clean: ## Remove all the files from the target folder
 .PHONY: mock
 mock: ## Generate all the mocks (for tests)
 	@echo "${COLOR_CYAN} 🧱 Generating all the mocks${COLOR_RESET}"
-	@go install go install go.uber.org/mock/mockgen@v0.4.0
+	@go install go.uber.org/mock/mockgen@v0.4.0
+	@mockgen -source=auth/proxy.go -package testutil -destination testutil/auth_mocks.go
+	@mockgen -source=dataverse/client.go -package testutil -destination testutil/dataverse_mocks.go
 
 ## Help:
 .PHONY: help
