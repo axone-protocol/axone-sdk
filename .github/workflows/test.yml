@@ -1,0 +1,60 @@
+name: Test
+
+on:
+  workflow_call:
+
+  push:
+    branches: [main]
+
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-tests:
+    runs-on: ubuntu-22.04
+    outputs:
+      status: ${{ steps.changed-files.outputs.any_changed == 'true' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Search for all modified files that involve the execution of tests
+        id: changed-files
+        uses: tj-actions/changed-files@v44.5.7
+        with:
+          files: |
+            **/*.go
+            go.mod
+            go.sum
+            Makefile
+
+  test-go:
+    runs-on: ubuntu-22.04
+    needs: check-tests
+    if: needs.check-tests.outputs.status
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v5.0.2
+        with:
+          go-version: "1.21"
+
+      - name: Test go project
+        run: |
+          make test-go
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        if: github.actor != 'dependabot[bot]'
+        with:
+          files: ./target/coverage.txt
+          env_vars: OS,GOLANG
+          fail_ci_if_error: false
+          verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}

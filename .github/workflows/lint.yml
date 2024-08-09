@@ -42,6 +42,100 @@ jobs:
       - name: Lint yaml files
         uses: ibiqlik/action-yamllint@v3.1.1
 
+  lint-go:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find changed go files
+        id: changed-go-files
+        uses: tj-actions/changed-files@v44.5.7
+        with:
+          files: |
+            **/*.go
+            go.mod
+            go.sum
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v5.0.2
+        if: steps.changed-go-files.outputs.any_changed == 'true'
+        with:
+          go-version: "1.21"
+          cache: false
+
+      - name: Lint go code (golangci-lint)
+        uses: golangci/golangci-lint-action@v6
+        if: steps.changed-go-files.outputs.any_changed == 'true'
+        with:
+          version: v1.59
+
+      - name: Lint go code (gofumpt)
+        if: steps.changed-go-files.outputs.any_changed == 'true'
+        run: |
+          go install mvdan.cc/gofumpt@v0.6.0
+          if [ "$(gofumpt -l .)" != "" ]; then
+            echo "❌ Code is not gofumpt!"
+            exit 1
+          fi
+          echo "✅ Code is gofumpt!"
+
+  analyze-go:
+    runs-on: ubuntu-22.04
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find changed go files
+        id: changed-go-files
+        uses: tj-actions/changed-files@v44.5.7
+        with:
+          files: |
+            **/*.go
+            go.mod
+            go.sum
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v5.0.2
+        with:
+          go-version: "1.21"
+          cache: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: "go"
+
+      - name: Autobuild project
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  lint-shell:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Lint shell scripts
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: .
+          version: "v0.9.0"
+        env:
+          SHELLCHECK_OPTS: -e SC2034
+
   lint-branch-name:
     runs-on: ubuntu-22.04
     if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened')
