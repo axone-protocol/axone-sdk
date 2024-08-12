@@ -1,6 +1,7 @@
 package credential_test
 
 import (
+	"fmt"
 	"github.com/axone-protocol/axone-sdk/credential"
 	"github.com/piprate/json-gold/ld"
 	. "github.com/smartystreets/goconvey/convey"
@@ -26,6 +27,20 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 				ToService: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
 			},
 		},
+		{
+			name:      "credential not signed",
+			serviceId: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
+			file:      "testdata/invalid_not-signed.jsonld",
+			wantErr:   fmt.Errorf("missing verifiable credential proof"),
+			result:    nil,
+		},
+		{
+			name:      "credential not signed",
+			serviceId: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
+			file:      "testdata/invalid_wrong-signature.jsonld",
+			wantErr:   fmt.Errorf("decode new credential: check embedded proof: check linked data proof: ecdsa: invalid signature"),
+			result:    nil,
+		},
 	}
 
 	for _, test := range tests {
@@ -40,7 +55,11 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 					authClaim, err := parser.ParseSigned(raw)
 
 					Convey("Then the result should be as expected", func() {
-						So(err, ShouldResemble, test.wantErr)
+						if err != nil {
+							So(err.Error(), ShouldResemble, test.wantErr.Error())
+						} else {
+							So(err, ShouldBeNil)
+						}
 						So(authClaim, ShouldResemble, test.result)
 					})
 				})
