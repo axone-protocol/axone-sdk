@@ -41,6 +41,48 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 			wantErr:   fmt.Errorf("decode new credential: check embedded proof: check linked data proof: ecdsa: invalid signature"),
 			result:    nil,
 		},
+		{
+			name:      "valid credential but wrong service id",
+			serviceId: "did:key:foo",
+			file:      "testdata/valid.jsonld",
+			wantErr:   fmt.Errorf("auth claim target doesn't match current service id: did:key:foo (target: did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz)"),
+			result:    nil,
+		},
+		{
+			name:      "credential without subject",
+			serviceId: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
+			file:      "testdata/invalid_malformated-subject.jsonld",
+			wantErr:   fmt.Errorf("malformed auth claim: malformed vc subject"),
+			result:    nil,
+		},
+		{
+			name:      "credential with multiple subject",
+			serviceId: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
+			file:      "testdata/invalid_multiple-subject.jsonld",
+			wantErr:   fmt.Errorf("malformed auth claim: expected a single vc claim"),
+			result:    nil,
+		},
+		{
+			name:      "credential with issuer different from subject",
+			serviceId: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
+			file:      "testdata/invalid_issuer-differs-subject.jsonld",
+			wantErr:   fmt.Errorf("auth claim subject differs from issuer (subject: did:key:zQ3shpoUHzwcgdt2gxjqHHnJnNkBVd4uX3ZBhmPiM7J93yqCr, issuer: did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz)"),
+			result:    nil,
+		},
+		{
+			name:      "toService claims is not a string",
+			serviceId: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
+			file:      "testdata/invalid_service-not-string.jsonld",
+			wantErr:   fmt.Errorf("malformed auth claim: key 'toService' is not a string"),
+			result:    nil,
+		},
+		{
+			name:      "toService claims key missing",
+			serviceId: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
+			file:      "testdata/invalid_service-key-missing.jsonld",
+			wantErr:   fmt.Errorf("malformed auth claim: key 'toService' not found"),
+			result:    nil,
+		},
 	}
 
 	for _, test := range tests {
