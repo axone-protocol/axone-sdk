@@ -3,6 +3,7 @@ package credential
 import (
 	"fmt"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
+	"github.com/piprate/json-gold/ld"
 )
 
 const ClaimToService = "toService"
@@ -37,20 +38,36 @@ func (ac *AuthClaim) From(vc *verifiable.Credential) error {
 
 var _ Parser[*AuthClaim] = (*AuthParser)(nil)
 
-type AuthParser struct{}
+type AuthParser struct {
+	*credentialParser
+	ServiceID string
+}
 
-func NewAuthParser() *AuthParser {
-	return &AuthParser{}
+func NewAuthParser(serviceID string, documentLoader ld.DocumentLoader) *AuthParser {
+	return &AuthParser{
+		credentialParser: &credentialParser{documentLoader: documentLoader},
+		ServiceID:        serviceID,
+	}
 }
 
 func (ap *AuthParser) ParseSigned(raw []byte) (*AuthClaim, error) {
-	cred, err := parseWithSignVerification(raw)
+	cred, err := ap.parseSigned(raw)
+	if err != nil {
+		return nil, err
+	}
 
-    authClaim := &AuthClaim{}
+	authClaim := &AuthClaim{}
 	err = authClaim.From(cred)
 	if err != nil {
 		return nil, fmt.Errorf("malformed auth claim: %w", err)
 	}
 
+	if authClaim.ToService != ap.ServiceID {
+		return nil, fmt.Errorf("auth claim target doesn't match current service id: %s (target: %s)", ap.ServiceID, authClaim.ToService)
+	}
+
+	if cred.Issuer.ID != authClaim.ID {
+		return nil, fmt.Errorf("auth claim subject differs from issuer (subject: %s, issuer: %s)", authClaim.ID, cred.Issuer.ID)
+	}
 	return authClaim, nil
 }
