@@ -9,6 +9,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	go.uber.org/mock v0.4.0
+	github.com/hyperledger/aries-framework-go v0.3.2
 )
 
 // Use cutom fork of prolog interpreter, only needed to build
