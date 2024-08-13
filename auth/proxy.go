@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/axone-protocol/axone-sdk/credential"
-	"github.com/piprate/json-gold/ld"
-
 	"github.com/axone-protocol/axone-sdk/dataverse"
 )
 
@@ -27,11 +25,11 @@ type authProxy struct {
 	authParser credential.Parser[*credential.AuthClaim]
 }
 
-func NewProxy(govAddr string, dvClient dataverse.Client, serviceID string) Proxy {
+func NewProxy(govAddr string, dvClient dataverse.Client, authParser credential.Parser[*credential.AuthClaim]) Proxy {
 	return &authProxy{
 		dvClient:   dvClient,
 		govAddr:    govAddr,
-		authParser: credential.NewAuthParser(serviceID, ld.NewDefaultDocumentLoader(nil)),
+		authParser: authParser,
 	}
 }
 
