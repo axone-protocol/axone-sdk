@@ -9,6 +9,8 @@ import (
 
 const ClaimToService = "toService"
 
+const ErrAuthClaim MessageError = "invalid auth claim"
+
 var _ Claim = (*AuthClaim)(nil)
 
 type AuthClaim struct {
@@ -19,16 +21,16 @@ type AuthClaim struct {
 func (ac *AuthClaim) From(vc *verifiable.Credential) error {
 	claims, ok := vc.Subject.([]verifiable.Subject)
 	if !ok {
-		return fmt.Errorf("malformed vc subject")
+		return NewVCError(ErrMalformedSubject, nil)
 	}
 
 	if len(claims) != 1 {
-		return fmt.Errorf("expected a single vc claim")
+		return NewVCError(ErrExpectSingleClaim, nil)
 	}
 
 	toService, err := extractCustomStringClaim(&claims[0], ClaimToService)
 	if err != nil {
-		return err
+		return NewVCError(ErrExtractClaim, err)
 	}
 
 	ac.ID = claims[0].ID
@@ -60,15 +62,15 @@ func (ap *AuthParser) ParseSigned(raw []byte) (*AuthClaim, error) {
 	authClaim := &AuthClaim{}
 	err = authClaim.From(cred)
 	if err != nil {
-		return nil, fmt.Errorf("malformed auth claim: %w", err)
+		return nil, NewVCError(ErrMalformed, err)
 	}
 
 	if authClaim.ToService != ap.ServiceID {
-		return nil, fmt.Errorf("auth claim target doesn't match current service id: %s (target: %s)", ap.ServiceID, authClaim.ToService)
+		return nil, NewVCError(ErrAuthClaim, fmt.Errorf("target doesn't match current service id: %s (target: %s)", ap.ServiceID, authClaim.ToService))
 	}
 
 	if cred.Issuer.ID != authClaim.ID {
-		return nil, fmt.Errorf("auth claim subject differs from issuer (subject: %s, issuer: %s)", authClaim.ID, cred.Issuer.ID)
+		return nil, NewVCError(ErrAuthClaim, fmt.Errorf("subject differs from issuer (subject: %s, issuer: %s)", authClaim.ID, cred.Issuer.ID))
 	}
 	return authClaim, nil
 }

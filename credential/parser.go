@@ -68,11 +68,11 @@ func (cp *credentialParser) parseSigned(raw []byte) (*verifiable.Credential, err
 
 func withCheck(vc *verifiable.Credential) (*verifiable.Credential, error) {
 	if vc.Expired != nil && time.Now().After(vc.Expired.Time) {
-		return nil, fmt.Errorf("verifiable credential expired")
+		return nil, NewVCError(ErrExpired, vc.Expired.Time)
 	}
 
 	if len(vc.Proofs) == 0 {
-		return nil, fmt.Errorf("missing verifiable credential proof")
+		return nil, NewVCError(ErrMissingProof, nil)
 	}
 	return vc, nil
 }
