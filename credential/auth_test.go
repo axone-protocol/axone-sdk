@@ -1,12 +1,25 @@
 package credential_test
 
 import (
+	_ "embed"
 	"fmt"
 	"github.com/axone-protocol/axone-sdk/credential"
-	"github.com/piprate/json-gold/ld"
+	jld "github.com/hyperledger/aries-framework-go/pkg/doc/ld"
+	"github.com/hyperledger/aries-framework-go/pkg/doc/ldcontext"
+	mockldstore "github.com/hyperledger/aries-framework-go/pkg/mock/ld"
+	mockprovider "github.com/hyperledger/aries-framework-go/pkg/mock/provider"
 	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"
+)
+
+var (
+	//go:embed testdata/contexts/credentials-v1.jsonld
+	mockCredentialsV1JSONLD []byte
+	//go:embed testdata/contexts/authentication-v4.jsonld
+	mockAuthenticationV4JSONLD []byte
+	//go:embed testdata/contexts/security-v2.jsonld
+	mockSecurityV2JSONLD []byte
 )
 
 func TestAuthParser_ParseSigned(t *testing.T) {
@@ -83,6 +96,13 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 			wantErr:   fmt.Errorf("malformed auth claim: key 'toService' not found"),
 			result:    nil,
 		},
+		{
+			name:      "credential expired",
+			serviceId: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
+			file:      "testdata/invalid_expired.jsonld",
+			wantErr:   fmt.Errorf("verifiable credential expired"),
+			result:    nil,
+		},
 	}
 
 	for _, test := range tests {
@@ -91,13 +111,29 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 				raw, err := os.ReadFile(test.file)
 				So(err, ShouldBeNil)
 
-				parser := credential.NewAuthParser(test.serviceId, ld.NewDefaultDocumentLoader(nil))
+				docLoader, err := jld.NewDocumentLoader(createMockCtxProvider(), jld.WithExtraContexts(
+					ldcontext.Document{
+						URL:     "https://w3id.org/axone/ontology/v4/schema/credential/digital-service/authentication/",
+						Content: mockAuthenticationV4JSONLD,
+					},
+					ldcontext.Document{
+						URL:     "https://www.w3.org/2018/credentials/v1",
+						Content: mockCredentialsV1JSONLD,
+					},
+					ldcontext.Document{
+						URL:     "https://w3id.org/security/v2",
+						Content: mockSecurityV2JSONLD,
+					},
+				))
+
+				parser := credential.NewAuthParser(test.serviceId, docLoader)
 
 				Convey("When parsing the credential", func() {
 					authClaim, err := parser.ParseSigned(raw)
 
 					Convey("Then the result should be as expected", func() {
-						if err != nil {
+						if test.wantErr != nil {
+							So(err, ShouldNotBeNil)
 							So(err.Error(), ShouldResemble, test.wantErr.Error())
 						} else {
 							So(err, ShouldBeNil)
@@ -108,4 +144,13 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 			})
 		})
 	}
+}
+
+func createMockCtxProvider() *mockprovider.Provider {
+	p := &mockprovider.Provider{
+		ContextStoreValue:        mockldstore.NewMockContextStore(),
+		RemoteProviderStoreValue: mockldstore.NewMockRemoteProviderStore(),
+	}
+
+	return p
 }
