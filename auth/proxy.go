@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+
 	"github.com/axone-protocol/axone-sdk/credential"
 	"github.com/axone-protocol/axone-sdk/dataverse"
 )
@@ -40,8 +41,7 @@ func (a *authProxy) Authenticate(ctx context.Context, credential []byte) (*Ident
 	}
 
 	// TODO: get authorized actions from governance, ex:
-	did := "did:key:example"
-	res, err := a.dvClient.ExecGov(ctx, a.govAddr, fmt.Sprintf("can(Action,'%s').", did))
+	res, err := a.dvClient.ExecGov(ctx, a.govAddr, fmt.Sprintf("can(Action,'%s').", authClaim.ID))
 	if err != nil {
 		return nil, err
 	}

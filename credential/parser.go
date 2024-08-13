@@ -3,22 +3,22 @@ package credential
 import (
 	"crypto/ecdsa"
 	"fmt"
-	"github.com/btcsuite/btcd/btcec"
-	"github.com/hyperledger/aries-framework-go/pkg/doc/did"
-	"github.com/hyperledger/aries-framework-go/pkg/doc/jose/jwk/jwksupport"
-	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
-	"github.com/hyperledger/aries-framework-go/pkg/vdr/fingerprint"
-	"github.com/piprate/json-gold/ld"
 	"time"
 
+	"github.com/btcsuite/btcd/btcec"
 	secp "github.com/decred/dcrd/dcrec/secp256k1/v4"
+	"github.com/hyperledger/aries-framework-go/pkg/doc/did"
+	"github.com/hyperledger/aries-framework-go/pkg/doc/jose/jwk/jwksupport"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite/ecdsasecp256k1signature2019"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite/ed25519signature2018"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite/ed25519signature2020"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/verifier"
+	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	"github.com/hyperledger/aries-framework-go/pkg/vdr"
+	"github.com/hyperledger/aries-framework-go/pkg/vdr/fingerprint"
 	"github.com/hyperledger/aries-framework-go/pkg/vdr/key"
+	"github.com/piprate/json-gold/ld"
 )
 
 type Claim interface {
@@ -60,7 +60,6 @@ func (cp *credentialParser) parseSigned(raw []byte) (*verifiable.Credential, err
 		),
 		verifiable.WithJSONLDDocumentLoader(cp.documentLoader),
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +113,7 @@ func mayResolveSecp256k1PubKey(issuerID, keyID string) (*verifier.PublicKey, err
 			JWK:  j,
 		}, nil
 	}
-	return nil, nil
+	return nil, fmt.Errorf("pub:key vdr Read: invalid fingerprint")
 }
 
 func extractCustomStringClaim(claim *verifiable.Subject, key string) (string, error) {

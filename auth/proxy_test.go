@@ -3,12 +3,13 @@ package auth_test
 import (
 	ctx "context"
 	"fmt"
+	"testing"
+
 	"github.com/axone-protocol/axone-sdk/auth"
 	"github.com/axone-protocol/axone-sdk/credential"
 	"github.com/axone-protocol/axone-sdk/testutil"
 	. "github.com/smartystreets/goconvey/convey"
 	"go.uber.org/mock/gomock"
-	"testing"
 )
 
 func TestAuthProxy_Authenticate(t *testing.T) {

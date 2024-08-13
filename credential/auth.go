@@ -2,6 +2,7 @@ package credential
 
 import (
 	"fmt"
+
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	"github.com/piprate/json-gold/ld"
 )
