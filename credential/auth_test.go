@@ -102,7 +102,7 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 			name:      "credential expired",
 			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
 			file:      "testdata/invalid_expired.jsonld",
-			wantErr:   credential.NewVCError(credential.ErrExpired, "2023-01-01 00:00:00 +0000 UTC"),
+			wantErr:   credential.NewVCError(credential.ErrExpired, fmt.Errorf("2023-01-01 00:00:00 +0000 UTC")),
 			result:    nil,
 		},
 	}

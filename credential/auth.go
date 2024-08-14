@@ -66,11 +66,13 @@ func (ap *AuthParser) ParseSigned(raw []byte) (*AuthClaim, error) {
 	}
 
 	if authClaim.ToService != ap.ServiceID {
-		return nil, NewVCError(ErrAuthClaim, fmt.Errorf("target doesn't match current service id: %s (target: %s)", ap.ServiceID, authClaim.ToService))
+		return nil, NewVCError(ErrAuthClaim,
+			fmt.Errorf("target doesn't match current service id: %s (target: %s)", ap.ServiceID, authClaim.ToService))
 	}
 
 	if cred.Issuer.ID != authClaim.ID {
-		return nil, NewVCError(ErrAuthClaim, fmt.Errorf("subject differs from issuer (subject: %s, issuer: %s)", authClaim.ID, cred.Issuer.ID))
+		return nil, NewVCError(ErrAuthClaim,
+			fmt.Errorf("subject differs from issuer (subject: %s, issuer: %s)", authClaim.ID, cred.Issuer.ID))
 	}
 	return authClaim, nil
 }

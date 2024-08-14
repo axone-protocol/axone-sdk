@@ -15,7 +15,7 @@ const (
 
 type VCError struct {
 	message MessageError
-	detail  interface{}
+	detail  error
 }
 
 func (e *VCError) Error() string {
@@ -25,7 +25,7 @@ func (e *VCError) Error() string {
 	return fmt.Sprintf("%v: %v", e.message, e.detail)
 }
 
-func NewVCError(message MessageError, detail interface{}) error {
+func NewVCError(message MessageError, detail error) error {
 	return &VCError{
 		message: message,
 		detail:  detail,
