@@ -50,7 +50,7 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 			result:    nil,
 		},
 		{
-			name:      "credential not signed",
+			name:      "credential with invalid signature",
 			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
 			file:      "testdata/invalid_wrong-signature.jsonld",
 			wantErr:   fmt.Errorf("decode new credential: check embedded proof: check linked data proof: ecdsa: invalid signature"),
