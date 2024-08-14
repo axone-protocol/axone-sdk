@@ -26,91 +26,73 @@ var (
 
 func TestAuthParser_ParseSigned(t *testing.T) {
 	tests := []struct {
-		name      string
-		serviceID string
-		file      string
-		wantErr   error
-		result    *credential.AuthClaim
+		name    string
+		file    string
+		wantErr error
+		result  *credential.AuthClaim
 	}{
 		{
-			name:      "valid credential",
-			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
-			file:      "testdata/valid.jsonld",
-			wantErr:   nil,
+			name:    "valid credential",
+			file:    "testdata/valid.jsonld",
+			wantErr: nil,
 			result: &credential.AuthClaim{
 				ID:        "did:key:zQ3shpoUHzwcgdt2gxjqHHnJnNkBVd4uX3ZBhmPiM7J93yqCr",
 				ToService: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
 			},
 		},
 		{
-			name:      "credential not signed",
-			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
-			file:      "testdata/invalid_not-signed.jsonld",
-			wantErr:   credential.NewVCError(credential.ErrMissingProof, nil),
-			result:    nil,
+			name:    "credential not signed",
+			file:    "testdata/invalid_not-signed.jsonld",
+			wantErr: credential.NewVCError(credential.ErrMissingProof, nil),
+			result:  nil,
 		},
 		{
-			name:      "credential with invalid signature",
-			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
-			file:      "testdata/invalid_wrong-signature.jsonld",
-			wantErr:   fmt.Errorf("decode new credential: check embedded proof: check linked data proof: ecdsa: invalid signature"),
-			result:    nil,
+			name:    "credential with invalid signature",
+			file:    "testdata/invalid_wrong-signature.jsonld",
+			wantErr: fmt.Errorf("decode new credential: check embedded proof: check linked data proof: ecdsa: invalid signature"),
+			result:  nil,
 		},
 		{
-			name:      "valid credential but wrong service id",
-			serviceID: "did:key:foo",
-			file:      "testdata/valid.jsonld",
-			wantErr:   credential.NewVCError(credential.ErrAuthClaim, fmt.Errorf("target doesn't match current service id: did:key:foo (target: did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz)")),
-			result:    nil,
+			name:    "credential without subject",
+			file:    "testdata/invalid_malformated-subject.jsonld",
+			wantErr: credential.NewVCError(credential.ErrMalformed, credential.NewVCError(credential.ErrMalformedSubject, nil)),
+			result:  nil,
 		},
 		{
-			name:      "credential without subject",
-			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
-			file:      "testdata/invalid_malformated-subject.jsonld",
-			wantErr:   credential.NewVCError(credential.ErrMalformed, credential.NewVCError(credential.ErrMalformedSubject, nil)),
-			result:    nil,
+			name:    "credential with multiple subject",
+			file:    "testdata/invalid_multiple-subject.jsonld",
+			wantErr: credential.NewVCError(credential.ErrMalformed, credential.NewVCError(credential.ErrExpectSingleClaim, nil)),
+			result:  nil,
 		},
 		{
-			name:      "credential with multiple subject",
-			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
-			file:      "testdata/invalid_multiple-subject.jsonld",
-			wantErr:   credential.NewVCError(credential.ErrMalformed, credential.NewVCError(credential.ErrExpectSingleClaim, nil)),
-			result:    nil,
+			name:    "credential with issuer different from subject",
+			file:    "testdata/invalid_issuer-differs-subject.jsonld",
+			wantErr: credential.NewVCError(credential.ErrAuthClaim, fmt.Errorf("subject differs from issuer (subject: did:key:zQ3shpoUHzwcgdt2gxjqHHnJnNkBVd4uX3ZBhmPiM7J93yqCr, issuer: did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz)")),
+			result:  nil,
 		},
 		{
-			name:      "credential with issuer different from subject",
-			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
-			file:      "testdata/invalid_issuer-differs-subject.jsonld",
-			wantErr:   credential.NewVCError(credential.ErrAuthClaim, fmt.Errorf("subject differs from issuer (subject: did:key:zQ3shpoUHzwcgdt2gxjqHHnJnNkBVd4uX3ZBhmPiM7J93yqCr, issuer: did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz)")),
-			result:    nil,
+			name:    "toService claims is not a string",
+			file:    "testdata/invalid_service-not-string.jsonld",
+			wantErr: credential.NewVCError(credential.ErrMalformed, credential.NewVCError(credential.ErrExtractClaim, fmt.Errorf("key 'toService' is not a string"))),
+			result:  nil,
 		},
 		{
-			name:      "toService claims is not a string",
-			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
-			file:      "testdata/invalid_service-not-string.jsonld",
-			wantErr:   credential.NewVCError(credential.ErrMalformed, credential.NewVCError(credential.ErrExtractClaim, fmt.Errorf("key 'toService' is not a string"))),
-			result:    nil,
+			name:    "toService claims key missing",
+			file:    "testdata/invalid_service-key-missing.jsonld",
+			wantErr: credential.NewVCError(credential.ErrMalformed, credential.NewVCError(credential.ErrExtractClaim, fmt.Errorf("key 'toService' not found"))),
+			result:  nil,
 		},
 		{
-			name:      "toService claims key missing",
-			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
-			file:      "testdata/invalid_service-key-missing.jsonld",
-			wantErr:   credential.NewVCError(credential.ErrMalformed, credential.NewVCError(credential.ErrExtractClaim, fmt.Errorf("key 'toService' not found"))),
-			result:    nil,
+			name:    "credential expired",
+			file:    "testdata/invalid_expired.jsonld",
+			wantErr: credential.NewVCError(credential.ErrExpired, fmt.Errorf("2023-01-01 00:00:00 +0000 UTC")),
+			result:  nil,
 		},
 		{
-			name:      "credential expired",
-			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
-			file:      "testdata/invalid_expired.jsonld",
-			wantErr:   credential.NewVCError(credential.ErrExpired, fmt.Errorf("2023-01-01 00:00:00 +0000 UTC")),
-			result:    nil,
-		},
-		{
-			name:      "credential not issued now",
-			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
-			file:      "testdata/invalid_futur-issued.jsonld",
-			wantErr:   credential.NewVCError(credential.ErrIssued, fmt.Errorf("2200-01-01 20:30:59.627706 +0200 +0200")),
-			result:    nil,
+			name:    "credential not issued now",
+			file:    "testdata/invalid_futur-issued.jsonld",
+			wantErr: credential.NewVCError(credential.ErrIssued, fmt.Errorf("2200-01-01 20:30:59.627706 +0200 +0200")),
+			result:  nil,
 		},
 	}
 
@@ -136,7 +118,7 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 				))
 				So(err, ShouldBeNil)
 
-				parser := credential.NewAuthParser(test.serviceID, docLoader)
+				parser := credential.NewAuthParser(docLoader)
 
 				Convey("When parsing the credential", func() {
 					authClaim, err := parser.ParseSigned(raw)

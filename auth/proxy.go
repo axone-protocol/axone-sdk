@@ -22,15 +22,20 @@ type Proxy interface {
 
 type authProxy struct {
 	dvClient   dataverse.Client
-	govAddr    string
 	authParser credential.Parser[*credential.AuthClaim]
+	govAddr    string
+	serviceID  string
 }
 
-func NewProxy(govAddr string, dvClient dataverse.Client, authParser credential.Parser[*credential.AuthClaim]) Proxy {
+func NewProxy(govAddr, serviceID string,
+	dvClient dataverse.Client,
+	authParser credential.Parser[*credential.AuthClaim],
+) Proxy {
 	return &authProxy{
 		dvClient:   dvClient,
-		govAddr:    govAddr,
 		authParser: authParser,
+		govAddr:    govAddr,
+		serviceID:  serviceID,
 	}
 }
 
@@ -38,6 +43,10 @@ func (a *authProxy) Authenticate(ctx context.Context, credential []byte) (*Ident
 	authClaim, err := a.authParser.ParseSigned(credential)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse credential: %w", err)
+	}
+
+	if authClaim.ToService != a.serviceID {
+		return nil, fmt.Errorf("credential not intended for this service: `%s` (target: `%s`)", a.serviceID, authClaim.ToService)
 	}
 
 	// TODO: get authorized actions from governance, ex:

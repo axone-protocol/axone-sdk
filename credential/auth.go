@@ -43,13 +43,11 @@ var _ Parser[*AuthClaim] = (*AuthParser)(nil)
 
 type AuthParser struct {
 	*credentialParser
-	ServiceID string
 }
 
-func NewAuthParser(serviceID string, documentLoader ld.DocumentLoader) *AuthParser {
+func NewAuthParser(documentLoader ld.DocumentLoader) *AuthParser {
 	return &AuthParser{
 		credentialParser: &credentialParser{documentLoader: documentLoader},
-		ServiceID:        serviceID,
 	}
 }
 
@@ -63,11 +61,6 @@ func (ap *AuthParser) ParseSigned(raw []byte) (*AuthClaim, error) {
 	err = authClaim.From(cred)
 	if err != nil {
 		return nil, NewVCError(ErrMalformed, err)
-	}
-
-	if authClaim.ToService != ap.ServiceID {
-		return nil, NewVCError(ErrAuthClaim,
-			fmt.Errorf("target doesn't match current service id: %s (target: %s)", ap.ServiceID, authClaim.ToService))
 	}
 
 	if cred.Issuer.ID != authClaim.ID {

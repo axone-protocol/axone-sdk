@@ -1,3 +1,4 @@
+//nolint:lll
 package auth_test
 
 import (
@@ -16,21 +17,30 @@ func TestAuthProxy_Authenticate(t *testing.T) {
 	tests := []struct {
 		name             string
 		credential       []byte
+		serviceID        string
 		expectedIdentity *auth.Identity
 		wantErr          error
 	}{
 		{
-			name:       "valid token",
+			name:       "valid credential",
 			credential: []byte("valid"),
+			serviceID:  "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
 			expectedIdentity: &auth.Identity{
 				DID:               "did:key:zQ3shpoUHzwcgdt2gxjqHHnJnNkBVd4uX3ZBhmPiM7J93yqCr",
 				AuthorizedActions: nil,
 			},
 		},
 		{
-			name:       "valid token",
+			name:       "check error returned by authParser",
 			credential: nil,
+			serviceID:  "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
 			wantErr:    fmt.Errorf("failed to parse credential: nil"),
+		},
+		{
+			name:       "valid credential that target wrong service",
+			credential: []byte("valid"),
+			serviceID:  "did:key:wrong",
+			wantErr:    fmt.Errorf("credential not intended for this service: `did:key:wrong` (target: `did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz`)"),
 		},
 	}
 
@@ -57,6 +67,7 @@ func TestAuthProxy_Authenticate(t *testing.T) {
 
 				aProxy := auth.NewProxy(
 					"did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
+					test.serviceID,
 					mockDataverse,
 					mockAuthParser)
 
