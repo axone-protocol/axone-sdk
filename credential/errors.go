@@ -25,7 +25,7 @@ func (e *VCError) Error() string {
 	return fmt.Sprintf("%v: %v", e.message, e.detail)
 }
 
-func NewVCError(message MessageError, detail interface{}) *VCError {
+func NewVCError(message MessageError, detail interface{}) error {
 	return &VCError{
 		message: message,
 		detail:  detail,
