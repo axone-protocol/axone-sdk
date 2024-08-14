@@ -105,6 +105,13 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 			wantErr:   credential.NewVCError(credential.ErrExpired, fmt.Errorf("2023-01-01 00:00:00 +0000 UTC")),
 			result:    nil,
 		},
+		{
+			name:      "credential not issued now",
+			serviceID: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
+			file:      "testdata/invalid_futur-issued.jsonld",
+			wantErr:   credential.NewVCError(credential.ErrIssued, fmt.Errorf("2200-01-01 20:30:59.627706 +0200 +0200")),
+			result:    nil,
+		},
 	}
 
 	for _, test := range tests {

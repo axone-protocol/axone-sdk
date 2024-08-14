@@ -71,6 +71,10 @@ func withCheck(vc *verifiable.Credential) (*verifiable.Credential, error) {
 		return nil, NewVCError(ErrExpired, fmt.Errorf("%s", vc.Expired.Time))
 	}
 
+	if vc.Issued != nil && time.Now().Before(vc.Issued.Time) {
+		return nil, NewVCError(ErrIssued, fmt.Errorf("%s", vc.Issued.Time))
+	}
+
 	if len(vc.Proofs) == 0 {
 		return nil, NewVCError(ErrMissingProof, nil)
 	}
