@@ -6,7 +6,7 @@ require (
 	github.com/axone-protocol/axoned/v9 v9.0.0
 	github.com/btcsuite/btcd v0.22.0-beta
 	github.com/cosmos/cosmos-sdk v0.50.9
-	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
