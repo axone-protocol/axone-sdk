@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -15,8 +16,9 @@ func NewServer(addr string, opts ...Option) *Server {
 	router := mux.NewRouter()
 	s := &Server{
 		server: &http.Server{
-			Addr:    addr,
-			Handler: router,
+			Addr:              addr,
+			Handler:           router,
+			ReadHeaderTimeout: 5 * time.Second,
 		},
 		router: router,
 	}

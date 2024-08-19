@@ -31,7 +31,9 @@ func (p *Proxy) HTTPReadHandler() auth.AuthenticatedHandler {
 		}
 
 		writer.WriteHeader(http.StatusOK)
-		io.Copy(writer, resource)
+		if _, err := io.Copy(writer, resource); err != nil {
+			return
+		}
 	}
 }
 
@@ -44,6 +46,8 @@ func (p *Proxy) HTTPStoreHandler() auth.AuthenticatedHandler {
 		}
 
 		writer.WriteHeader(http.StatusOK)
-		io.Copy(writer, vc)
+		if _, err := io.Copy(writer, vc); err != nil {
+			return
+		}
 	}
 }

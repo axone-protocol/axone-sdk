@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/axone-protocol/axone-sdk/credential"
 	"github.com/axone-protocol/axone-sdk/dataverse"
 )
 
@@ -20,29 +21,42 @@ type Proxy interface {
 }
 
 type authProxy struct {
-	dvClient dataverse.Client
-	govAddr  string
+	dvClient   dataverse.Client
+	authParser credential.Parser[*credential.AuthClaim]
+	govAddr    string
+	serviceID  string
 }
 
-func NewProxy(govAddr string, dvClient dataverse.Client) Proxy {
+func NewProxy(govAddr, serviceID string,
+	dvClient dataverse.Client,
+	authParser credential.Parser[*credential.AuthClaim],
+) Proxy {
 	return &authProxy{
-		dvClient: dvClient,
-		govAddr:  govAddr,
+		dvClient:   dvClient,
+		authParser: authParser,
+		govAddr:    govAddr,
+		serviceID:  serviceID,
 	}
 }
 
 func (a *authProxy) Authenticate(ctx context.Context, credential []byte) (*Identity, error) {
-	// parse credential
-	// verify signature
-	// get authorized actions from governance, ex:
-	did := "did:key:example"
-	res, err := a.dvClient.ExecGov(ctx, a.govAddr, fmt.Sprintf("can(Action,'%s').", did))
+	authClaim, err := a.authParser.ParseSigned(credential)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse credential: %w", err)
+	}
+
+	if authClaim.ToService != a.serviceID {
+		return nil, fmt.Errorf("credential not intended for this service: `%s` (target: `%s`)", a.serviceID, authClaim.ToService)
+	}
+
+	// TODO: get authorized actions from governance, ex:
+	res, err := a.dvClient.ExecGov(ctx, a.govAddr, fmt.Sprintf("can(Action,'%s').", authClaim.ID))
 	if err != nil {
 		return nil, err
 	}
 
 	return &Identity{
-		DID:               did,
+		DID:               authClaim.ID,
 		AuthorizedActions: res.([]string),
 	}, nil
 }

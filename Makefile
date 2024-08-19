@@ -78,6 +78,7 @@ mock: ## Generate all the mocks (for tests)
 	@go install go.uber.org/mock/mockgen@v0.4.0
 	@mockgen -source=auth/proxy.go -package testutil -destination testutil/auth_mocks.go
 	@mockgen -source=dataverse/client.go -package testutil -destination testutil/dataverse_mocks.go
+	@mockgen -source=credential/parser.go -package testutil -destination testutil/credential_mocks.go
 
 ## Help:
 .PHONY: help

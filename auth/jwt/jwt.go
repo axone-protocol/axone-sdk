@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/axone-protocol/axone-sdk/auth"
-
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 )

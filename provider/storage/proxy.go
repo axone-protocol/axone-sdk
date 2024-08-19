@@ -8,6 +8,7 @@ import (
 	"io"
 
 	"github.com/axone-protocol/axone-sdk/auth"
+	"github.com/axone-protocol/axone-sdk/credential"
 	"github.com/axone-protocol/axone-sdk/dataverse"
 	"github.com/axone-protocol/axone-sdk/keys"
 )
@@ -31,7 +32,9 @@ type Proxy struct {
 func NewProxy(
 	ctx context.Context,
 	key *keys.Key,
+	serviceID string,
 	dvClient dataverse.Client,
+	authParser credential.Parser[*credential.AuthClaim],
 	readFn func(context.Context, string) (io.Reader, error),
 	storeFn func(context.Context, string, io.Reader) error,
 ) (*Proxy, error) {
@@ -43,7 +46,7 @@ func NewProxy(
 	return &Proxy{
 		key:       key,
 		dvClient:  dvClient,
-		authProxy: auth.NewProxy(gov, dvClient),
+		authProxy: auth.NewProxy(gov, serviceID, dvClient, authParser),
 		readFn:    readFn,
 		storeFn:   storeFn,
 	}, nil
