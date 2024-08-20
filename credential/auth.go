@@ -7,7 +7,10 @@ import (
 	"github.com/piprate/json-gold/ld"
 )
 
-const ClaimToService = "toService"
+const (
+	ClaimToService             = "toService"
+	ProofPurposeAuthentication = "authentication"
+)
 
 const ErrAuthClaim MessageError = "invalid auth claim"
 
@@ -63,9 +66,18 @@ func (ap *AuthParser) ParseSigned(raw []byte) (*AuthClaim, error) {
 		return nil, NewVCError(ErrMalformed, err)
 	}
 
+	proof, err := extractProof(cred)
+	if err != nil {
+		return nil, NewVCError(ErrInvalidProof, err)
+	}
+	if proof.ProofPurpose != ProofPurposeAuthentication {
+		return nil, NewVCError(ErrAuthClaim,
+			fmt.Errorf("proof purpose not targeting `%s` (proof purpose: `%s`)", ProofPurposeAuthentication, proof.ProofPurpose))
+	}
+
 	if cred.Issuer.ID != authClaim.ID {
 		return nil, NewVCError(ErrAuthClaim,
-			fmt.Errorf("subject differs from issuer (subject: %s, issuer: %s)", authClaim.ID, cred.Issuer.ID))
+			fmt.Errorf("subject differs from issuer (subject: `%s`, issuer: `%s`)", authClaim.ID, cred.Issuer.ID))
 	}
 	return authClaim, nil
 }
