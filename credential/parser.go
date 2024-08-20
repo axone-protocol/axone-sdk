@@ -3,11 +3,11 @@ package credential
 import (
 	"crypto/ecdsa"
 	"fmt"
-	"github.com/hyperledger/aries-framework-go/component/models/ld/proof"
 	"time"
 
 	"github.com/btcsuite/btcd/btcec"
 	secp "github.com/decred/dcrd/dcrec/secp256k1/v4"
+	"github.com/hyperledger/aries-framework-go/component/models/ld/proof"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/did"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/jose/jwk/jwksupport"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite"
@@ -77,7 +77,7 @@ func withCheck(vc *verifiable.Credential) (*verifiable.Credential, error) {
 	}
 
 	if _, err := extractProof(vc); err != nil {
-		return nil, err
+		return nil, NewVCError(ErrInvalidProof, err)
 	}
 
 	return vc, nil
@@ -142,7 +142,7 @@ func extractProof(vc *verifiable.Credential) (*proof.Proof, error) {
 
 	pf, err := proof.NewProof(vc.Proofs[0])
 	if err != nil {
-		return nil, NewVCError(ErrInvalidProof, err)
+		return nil, err
 	}
 	return pf, nil
 }

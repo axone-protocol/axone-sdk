@@ -36,14 +36,14 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 			file:    "testdata/valid.jsonld",
 			wantErr: nil,
 			result: &credential.AuthClaim{
-				ID:        "did:key:zQ3shpoUHzwcgdt2gxjqHHnJnNkBVd4uX3ZBhmPiM7J93yqCr",
+				ID:        "did:key:zQ3shhCAzQcroi4RqZ48eNudKWf75Fvv9ryJsxbaWCCPsfnFj",
 				ToService: "did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
 			},
 		},
 		{
 			name:    "credential not signed",
 			file:    "testdata/invalid_not-signed.jsonld",
-			wantErr: credential.NewVCError(credential.ErrMissingProof, nil),
+			wantErr: credential.NewVCError(credential.ErrInvalidProof, credential.NewVCError(credential.ErrMissingProof, nil)),
 			result:  nil,
 		},
 		{
@@ -67,7 +67,7 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 		{
 			name:    "credential with issuer different from subject",
 			file:    "testdata/invalid_issuer-differs-subject.jsonld",
-			wantErr: credential.NewVCError(credential.ErrAuthClaim, fmt.Errorf("subject differs from issuer (subject: did:key:zQ3shpoUHzwcgdt2gxjqHHnJnNkBVd4uX3ZBhmPiM7J93yqCr, issuer: did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz)")),
+			wantErr: credential.NewVCError(credential.ErrAuthClaim, fmt.Errorf("subject differs from issuer (subject: `did:key:zQ3shpoUHzwcgdt2gxjqHHnJnNkBVd4uX3ZBhmPiM7J93yqCr`, issuer: `did:key:zQ3shhCAzQcroi4RqZ48eNudKWf75Fvv9ryJsxbaWCCPsfnFj`)")),
 			result:  nil,
 		},
 		{
@@ -92,6 +92,18 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 			name:    "credential not issued now",
 			file:    "testdata/invalid_futur-issued.jsonld",
 			wantErr: credential.NewVCError(credential.ErrIssued, fmt.Errorf("2200-01-01 20:30:59.627706 +0200 +0200")),
+			result:  nil,
+		},
+		{
+			name:    "credential not issued now",
+			file:    "testdata/invalid_futur-issued.jsonld",
+			wantErr: credential.NewVCError(credential.ErrIssued, fmt.Errorf("2200-01-01 20:30:59.627706 +0200 +0200")),
+			result:  nil,
+		},
+		{
+			name:    "credential with not authentication proof purpose",
+			file:    "testdata/invalid_not-authentication-proof.jsonld",
+			wantErr: credential.NewVCError(credential.ErrAuthClaim, fmt.Errorf("proof purpose not targeting `authentication` (proof purpose: `assertionMethod`)")),
 			result:  nil,
 		},
 	}
