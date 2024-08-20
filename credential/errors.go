@@ -8,6 +8,7 @@ const (
 	ErrExpired           MessageError = "verifiable credential expired"
 	ErrIssued            MessageError = "verifiable credential issued in the future"
 	ErrMissingProof      MessageError = "missing verifiable credential proof"
+	ErrInvalidProof      MessageError = "invalid verifiable credential proof"
 	ErrMalformedSubject  MessageError = "malformed verifiable credential subject"
 	ErrExpectSingleClaim MessageError = "expect a single verifiable credential claim"
 	ErrExtractClaim      MessageError = "failed to extract claim"

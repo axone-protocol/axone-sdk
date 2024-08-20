@@ -3,6 +3,7 @@ package credential
 import (
 	"crypto/ecdsa"
 	"fmt"
+	"github.com/hyperledger/aries-framework-go/component/models/ld/proof"
 	"time"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -75,9 +76,10 @@ func withCheck(vc *verifiable.Credential) (*verifiable.Credential, error) {
 		return nil, NewVCError(ErrIssued, fmt.Errorf("%s", vc.Issued.Time))
 	}
 
-	if len(vc.Proofs) == 0 {
-		return nil, NewVCError(ErrMissingProof, nil)
+	if _, err := extractProof(vc); err != nil {
+		return nil, err
 	}
+
 	return vc, nil
 }
 
@@ -131,4 +133,16 @@ func extractCustomStringClaim(claim *verifiable.Subject, key string) (string, er
 		return "", fmt.Errorf("key '%s' is not a string", key)
 	}
 	return strField, nil
+}
+
+func extractProof(vc *verifiable.Credential) (*proof.Proof, error) {
+	if len(vc.Proofs) == 0 {
+		return nil, NewVCError(ErrMissingProof, nil)
+	}
+
+	pf, err := proof.NewProof(vc.Proofs[0])
+	if err != nil {
+		return nil, NewVCError(ErrInvalidProof, err)
+	}
+	return pf, nil
 }
