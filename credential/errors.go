@@ -12,6 +12,7 @@ const (
 	ErrMalformedSubject  MessageError = "malformed verifiable credential subject"
 	ErrExpectSingleClaim MessageError = "expect a single verifiable credential claim"
 	ErrExtractClaim      MessageError = "failed to extract claim"
+	ErrParse             MessageError = "failed to parse verifiable credential"
 	ErrMalformed         MessageError = "malformed verifiable credential"
 )
 
