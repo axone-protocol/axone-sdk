@@ -14,7 +14,7 @@ func (f *Factory) HTTPAuthHandler(proxy auth.Proxy) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		credential, err := io.ReadAll(request.Body)
 		if err != nil {
-			http.Error(writer, fmt.Errorf("failed to read request body credential: %w", err).Error(), http.StatusBadRequest)
+			http.Error(writer, fmt.Errorf("failed to read request body credential: %w", err).Error(), http.StatusInternalServerError)
 			return
 		}
 
