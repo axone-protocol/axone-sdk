@@ -49,7 +49,7 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 		{
 			name:    "credential with invalid signature",
 			file:    "testdata/invalid_wrong-signature.jsonld",
-			wantErr: fmt.Errorf("decode new credential: check embedded proof: check linked data proof: ecdsa: invalid signature"),
+			wantErr: credential.NewVCError(credential.ErrParse, fmt.Errorf("decode new credential: check embedded proof: check linked data proof: ecdsa: invalid signature")),
 			result:  nil,
 		},
 		{
