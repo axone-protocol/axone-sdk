@@ -16,6 +16,12 @@ type client struct {
 	dataverseClient dvschema.QueryClient
 }
 
+func NewDataverseClient(dataverseClient dvschema.QueryClient) Client {
+	return &client{
+		dataverseClient,
+	}
+}
+
 func NewClient(grpcAddr, contractAddr string, opts ...grpc.DialOption) (Client, error) {
 	dataverseClient, err := dvschema.NewQueryClient(grpcAddr, contractAddr, opts...)
 	if err != nil {
