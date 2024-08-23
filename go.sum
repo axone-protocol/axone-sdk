@@ -76,7 +76,13 @@ github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5 v5.0.0-
 github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5 v5.0.0-20240822131059-8eaef303483a/go.mod h1:50VhFXluOq+7HLCsYhE/iaw3yRKohfC4i5dotePt8UI=
 github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5 v5.0.0-20240823054355-5481997c6a5a h1:8lBHiFSPJZXpq15MvE2Q4qagoj7lK98wtcS/cxJYNkY=
 github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5 v5.0.0-20240823054355-5481997c6a5a/go.mod h1:50VhFXluOq+7HLCsYhE/iaw3yRKohfC4i5dotePt8UI=
+github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5 v5.0.0-20240823100435-9530b1d56ff7 h1:bOW3EEJeH1ucAzDWZjzqn4NAGhFW/9QFe1QL6EtMesk=
+github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5 v5.0.0-20240823100435-9530b1d56ff7/go.mod h1:50VhFXluOq+7HLCsYhE/iaw3yRKohfC4i5dotePt8UI=
 github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 v5.0.0-20240822131059-8eaef303483a/go.mod h1:Bx1SoFsvTDiZgr0E3+80poq01vSvYi2295b6Cd4fUM0=
+github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 v5.0.0-20240823054355-5481997c6a5a h1:QmPI+9lO129kwYo29ibVHGuOMbV7NlLFRdS1n6H9MHg=
+github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 v5.0.0-20240823054355-5481997c6a5a/go.mod h1:Bx1SoFsvTDiZgr0E3+80poq01vSvYi2295b6Cd4fUM0=
+github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 v5.0.0-20240823100435-9530b1d56ff7 h1:FXJsiY9YdeP9noJGnSyaZs4xb9f2Z7jYoXhowvu8T+Q=
+github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 v5.0.0-20240823100435-9530b1d56ff7/go.mod h1:Bx1SoFsvTDiZgr0E3+80poq01vSvYi2295b6Cd4fUM0=
 github.com/axone-protocol/axoned/v9 v9.0.0 h1:tED2oKxf9KF4S8hbpDuUJL/91pEoYrV1femALJovRmY=
 github.com/axone-protocol/axoned/v9 v9.0.0/go.mod h1:9RDsnrYBqXPQPOMFTWiTFULImclBrvUL1U89PUAimHA=
 github.com/axone-protocol/prolog v1.0.0 h1:CASA1QrPOWhYox8YUStML33rekoA/7Gnp/ldDPZqCTA=
