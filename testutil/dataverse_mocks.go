@@ -54,32 +54,17 @@ func (mr *MockClientMockRecorder) ExecGov(arg0, arg1, arg2 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecGov", reflect.TypeOf((*MockClient)(nil).ExecGov), arg0, arg1, arg2)
 }
 
-// GetGovAddr mocks base method.
-func (m *MockClient) GetGovAddr(arg0 context.Context) (string, error) {
+// GetResourceGovAddr mocks base method.
+func (m *MockClient) GetResourceGovAddr(arg0 context.Context, arg1 string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetGovAddr", arg0)
+	ret := m.ctrl.Call(m, "GetResourceGovAddr", arg0, arg1)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetGovAddr indicates an expected call of GetGovAddr.
-func (mr *MockClientMockRecorder) GetGovAddr(arg0 any) *gomock.Call {
+// GetResourceGovAddr indicates an expected call of GetResourceGovAddr.
+func (mr *MockClientMockRecorder) GetResourceGovAddr(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGovAddr", reflect.TypeOf((*MockClient)(nil).GetGovAddr), arg0)
-}
-
-// GetGovCode mocks base method.
-func (m *MockClient) GetGovCode(arg0 context.Context, arg1 string) (string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetGovCode", arg0, arg1)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetGovCode indicates an expected call of GetGovCode.
-func (mr *MockClientMockRecorder) GetGovCode(arg0, arg1 any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGovCode", reflect.TypeOf((*MockClient)(nil).GetGovCode), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResourceGovAddr", reflect.TypeOf((*MockClient)(nil).GetResourceGovAddr), arg0, arg1)
 }

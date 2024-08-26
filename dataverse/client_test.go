@@ -12,7 +12,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestClient_GetGovAddr(t *testing.T) {
+func TestClient_NewDataverseClient(t *testing.T) {
 	tests := []struct {
 		name        string
 		returnedErr error
@@ -28,7 +28,7 @@ func TestClient_GetGovAddr(t *testing.T) {
 		{
 			name:        "receive an error",
 			returnedErr: fmt.Errorf("error"),
-			wantErr:     fmt.Errorf("failed to get governance address: %w", fmt.Errorf("error")),
+			wantErr:     fmt.Errorf("failed to get cognitarium address: %w", fmt.Errorf("error")),
 			wantAddr:    "",
 		},
 	}
@@ -50,14 +50,16 @@ func TestClient_GetGovAddr(t *testing.T) {
 					).
 					Times(1)
 
-				client := dataverse.NewDataverseClient(mockClient)
+				Convey("When Client is created", func() {
+					client, err := dataverse.NewDataverseClient(context.Background(), mockClient)
 
-				Convey("When GetGovAddr is called", func() {
-					resp, err := client.GetGovAddr(context.Background())
-
-					Convey("Then it should return the governance address", func() {
+					Convey("Then the client should be created if no error on dataverse client", func() {
 						So(err, ShouldEqual, test.wantErr)
-						So(resp, ShouldEqual, test.wantAddr)
+						if test.wantErr == nil {
+							So(client, ShouldNotBeNil)
+						} else {
+							So(client, ShouldBeNil)
+						}
 					})
 				})
 			})

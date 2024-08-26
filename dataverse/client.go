@@ -9,46 +9,53 @@ import (
 )
 
 type Client interface {
-	GetGovAddr(context.Context) (string, error)
-	GetGovCode(context.Context, string) (string, error)
+	GetResourceGovAddr(context.Context, string) (string, error)
 	ExecGov(context.Context, string, string) (interface{}, error)
 }
 
 type client struct {
 	dataverseClient dvschema.QueryClient
+	cognitariumAddr string
 }
 
-func NewDataverseClient(dataverseClient dvschema.QueryClient) Client {
+func NewDataverseClient(ctx context.Context, dataverseClient dvschema.QueryClient) (Client, error) {
+	cognitariumAddr, err := getCognitariumAddr(ctx, dataverseClient)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get cognitarium address: %w", err)
+	}
+
 	return &client{
 		dataverseClient,
-	}
+		cognitariumAddr,
+	}, nil
 }
 
-func NewClient(grpcAddr, contractAddr string, opts ...grpc.DialOption) (Client, error) {
+func NewClient(ctx context.Context,
+	grpcAddr, contractAddr string,
+	opts ...grpc.DialOption,
+) (Client, error) {
 	dataverseClient, err := dvschema.NewQueryClient(grpcAddr, contractAddr, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create dataverse client: %w", err)
 	}
 
-	return &client{
-		dataverseClient,
-	}, nil
+	return NewDataverseClient(ctx, dataverseClient)
 }
 
-func (c *client) GetGovAddr(ctx context.Context) (string, error) {
-	query := dvschema.QueryMsg_Dataverse{}
-	resp, err := c.dataverseClient.Dataverse(ctx, &query)
-	if err != nil {
-		return "", fmt.Errorf("failed to get governance address: %w", err)
-	}
-
-	return string(resp.TriplestoreAddress), nil
+func (c *client) GetResourceGovAddr(_ context.Context, _ string) (string, error) {
+	panic("not implemented")
 }
 
 func (c *client) ExecGov(_ context.Context, _ string, _ string) (interface{}, error) {
 	panic("not implemented")
 }
 
-func (c *client) GetGovCode(_ context.Context, _ string) (string, error) {
-	panic("not implemented")
+func getCognitariumAddr(ctx context.Context, dvClient dvschema.QueryClient) (string, error) {
+	query := dvschema.QueryMsg_Dataverse{}
+	resp, err := dvClient.Dataverse(ctx, &query)
+	if err != nil {
+		return "", err
+	}
+
+	return string(resp.TriplestoreAddress), nil
 }
