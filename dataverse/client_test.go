@@ -3,12 +3,13 @@ package dataverse_test
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	schema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
 	"github.com/axone-protocol/axone-sdk/dataverse"
 	"github.com/axone-protocol/axone-sdk/testutil"
 	. "github.com/smartystreets/goconvey/convey"
 	"go.uber.org/mock/gomock"
-	"testing"
 )
 
 func TestClient_GetGovAddr(t *testing.T) {
@@ -35,7 +36,6 @@ func TestClient_GetGovAddr(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			Convey("Given a mocked dataverse client", t, func() {
-
 				controller := gomock.NewController(t)
 				defer controller.Finish()
 

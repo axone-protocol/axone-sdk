@@ -38,7 +38,7 @@ func NewProxy(
 	readFn func(context.Context, string) (io.Reader, error),
 	storeFn func(context.Context, string, io.Reader) error,
 ) (*Proxy, error) {
-	gov, err := dvClient.GetGovAddr(ctx, key.DID)
+	gov, err := dvClient.GetGovAddr(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (p *Proxy) Read(ctx context.Context, id *auth.Identity, resourceID string) 
 	}
 
 	// get resource gov addr
-	govAddr, err := p.dvClient.GetGovAddr(ctx, resourceID)
+	govAddr, err := p.dvClient.GetGovCode(ctx, resourceID)
 	if err != nil {
 		return nil, err
 	}

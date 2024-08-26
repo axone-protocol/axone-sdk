@@ -3,12 +3,14 @@ package dataverse
 import (
 	"context"
 	"fmt"
+
 	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
 	"google.golang.org/grpc"
 )
 
 type Client interface {
 	GetGovAddr(context.Context) (string, error)
+	GetGovCode(context.Context, string) (string, error)
 	ExecGov(context.Context, string, string) (interface{}, error)
 }
 
@@ -43,6 +45,10 @@ func (c *client) GetGovAddr(ctx context.Context) (string, error) {
 	return string(resp.TriplestoreAddress), nil
 }
 
-func (c *client) ExecGov(ctx context.Context, addr string, method string) (interface{}, error) {
+func (c *client) ExecGov(_ context.Context, _ string, _ string) (interface{}, error) {
+	panic("not implemented")
+}
+
+func (c *client) GetGovCode(_ context.Context, _ string) (string, error) {
 	panic("not implemented")
 }

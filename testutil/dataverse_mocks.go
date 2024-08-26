@@ -68,3 +68,18 @@ func (mr *MockClientMockRecorder) GetGovAddr(arg0 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGovAddr", reflect.TypeOf((*MockClient)(nil).GetGovAddr), arg0)
 }
+
+// GetGovCode mocks base method.
+func (m *MockClient) GetGovCode(arg0 context.Context, arg1 string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetGovCode", arg0, arg1)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetGovCode indicates an expected call of GetGovCode.
+func (mr *MockClientMockRecorder) GetGovCode(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGovCode", reflect.TypeOf((*MockClient)(nil).GetGovCode), arg0, arg1)
+}
