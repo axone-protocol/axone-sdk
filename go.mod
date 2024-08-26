@@ -3,8 +3,8 @@ module github.com/axone-protocol/axone-sdk
 go 1.22.5
 
 require (
-	github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5 v5.0.0-20240823100435-9530b1d56ff7
-	github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 v5.0.0-20240823100435-9530b1d56ff7
+	github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5 v5.0.0-20240826124342-6e6abdf73c9a
+	github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 v5.0.0-20240826124342-6e6abdf73c9a
 	github.com/axone-protocol/axoned/v9 v9.0.0
 	github.com/btcsuite/btcd v0.22.0-beta
 	github.com/cosmos/cosmos-sdk v0.50.9
@@ -114,7 +114,7 @@ require (
 	github.com/huandu/skiplist v1.2.0 // indirect
 	github.com/hyperledger/aries-framework-go/component/kmscrypto v0.0.0-20230427134832-0c9969493bd3 // indirect
 	github.com/hyperledger/aries-framework-go/component/log v0.0.0-20230427134832-0c9969493bd3 // indirect
-	github.com/hyperledger/aries-framework-go/component/models v0.0.0-20230501135648-a9a7ad029347 // indirect
+	github.com/hyperledger/aries-framework-go/component/models v0.0.0-20230501135648-a9a7ad029347
 	github.com/hyperledger/aries-framework-go/component/storageutil v0.0.0-20230427134832-0c9969493bd3 // indirect
 	github.com/hyperledger/aries-framework-go/spi v0.0.0-20230427134832-0c9969493bd3 // indirect
 	github.com/hyperledger/ursa-wrapper-go v0.3.1 // indirect
@@ -199,7 +199,7 @@ require (
 	google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240318140521-94a12d6c2237 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240709173604-40e1e62336c5 // indirect
-	google.golang.org/grpc v1.64.1 // indirect
+	google.golang.org/grpc v1.64.1
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
