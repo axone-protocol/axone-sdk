@@ -79,6 +79,8 @@ mock: ## Generate all the mocks (for tests)
 	@mockgen -source=auth/proxy.go -package testutil -destination testutil/auth_mocks.go
 	@mockgen -source=dataverse/client.go -package testutil -destination testutil/dataverse_mocks.go
 	@mockgen -source=credential/parser.go -package testutil -destination testutil/credential_mocks.go
+	@mockgen -package testutil -destination testutil/dataverse_client_mocks.go -mock_names QueryClient=MockDataverseQueryClient github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 QueryClient
+	@mockgen -package testutil -destination testutil/cognitarium_client_mocks.go -mock_names QueryClient=MockCognitariumQueryClient github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5 QueryClient
 
 ## Help:
 .PHONY: help
