@@ -2,8 +2,9 @@ package dataverse
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-
+	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
 	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
 	"google.golang.org/grpc"
 )
@@ -14,11 +15,12 @@ type Client interface {
 }
 
 type client struct {
-	dataverseClient dvschema.QueryClient
-	cognitariumAddr string
+	dataverseClient   dvschema.QueryClient
+	cognitariumClient cgschema.QueryClient
+	cognitariumAddr   string
 }
 
-func NewDataverseClient(ctx context.Context, dataverseClient dvschema.QueryClient) (Client, error) {
+func NewDataverseClient(ctx context.Context, dataverseClient dvschema.QueryClient, cognitariumClient cgschema.QueryClient) (Client, error) {
 	cognitariumAddr, err := getCognitariumAddr(ctx, dataverseClient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get cognitarium address: %w", err)
@@ -26,6 +28,7 @@ func NewDataverseClient(ctx context.Context, dataverseClient dvschema.QueryClien
 
 	return &client{
 		dataverseClient,
+		cognitariumClient,
 		cognitariumAddr,
 	}, nil
 }
@@ -39,11 +42,45 @@ func NewClient(ctx context.Context,
 		return nil, fmt.Errorf("failed to create dataverse client: %w", err)
 	}
 
-	return NewDataverseClient(ctx, dataverseClient)
+	cognitariumAddr, err := getCognitariumAddr(ctx, dataverseClient)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get cognitarium address: %w", err)
+	}
+
+	cognitariumClient, err := cgschema.NewQueryClient(grpcAddr, cognitariumAddr, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create cognitarium client: %w", err)
+	}
+
+	return &client{
+		dataverseClient,
+		cognitariumClient,
+		cognitariumAddr,
+	}, nil
 }
 
-func (c *client) GetResourceGovAddr(_ context.Context, _ string) (string, error) {
-	panic("not implemented")
+func (c *client) GetResourceGovAddr(_ context.Context, resourceDID string) (string, error) {
+	query := buildGetResourceGovAddrRequest(resourceDID)
+	queryB, _ := json.Marshal(query)
+	fmt.Printf("query : %s", queryB)
+	response, err := c.cognitariumClient.Select(context.Background(), &cgschema.QueryMsg_Select{Query: query})
+	if err != nil {
+		return "", err
+	}
+
+	if len(response.Results.Bindings) != 1 {
+		return "", fmt.Errorf("could not find governance code")
+	}
+
+	codeBinding, ok := response.Results.Bindings[0]["code"]
+	if !ok {
+		return "", fmt.Errorf("could not find governance code")
+	}
+	code, ok := codeBinding.ValueType.(cgschema.URI)
+	if !ok {
+		return "", fmt.Errorf("could not decode governance code")
+	}
+	return string(*code.Value.Full), nil
 }
 
 func (c *client) ExecGov(_ context.Context, _ string, _ string) (interface{}, error) {
