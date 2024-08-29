@@ -22,7 +22,8 @@ type client struct {
 
 func NewDataverseClient(ctx context.Context,
 	dataverseClient dvschema.QueryClient,
-	cognitariumClient cgschema.QueryClient) (Client, error) {
+	cognitariumClient cgschema.QueryClient,
+) (Client, error) {
 	cognitariumAddr, err := getCognitariumAddr(ctx, dataverseClient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get cognitarium address: %w", err)
@@ -69,16 +70,16 @@ func (c *client) GetResourceGovAddr(_ context.Context, resourceDID string) (stri
 	}
 
 	if len(response.Results.Bindings) != 1 {
-		return "", fmt.Errorf("could not find governance code")
+		return "", NewDVError(ErrNoResult, nil)
 	}
 
 	codeBinding, ok := response.Results.Bindings[0]["code"]
 	if !ok {
-		return "", fmt.Errorf("could not find governance code")
+		return "", NewDVError(ErrVarNotFound, nil)
 	}
 	code, ok := codeBinding.ValueType.(cgschema.URI)
 	if !ok {
-		return "", fmt.Errorf("could not decode governance code")
+		return "", NewDVError(ErrType, fmt.Errorf("expected URI, got %T", codeBinding.ValueType))
 	}
 	return string(*code.Value.Full), nil
 }

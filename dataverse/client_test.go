@@ -131,7 +131,7 @@ func TestClient_GetResourceGovAddr(t *testing.T) {
 				},
 			},
 			responseError: nil,
-			wantErr:       fmt.Errorf("could not find governance code"),
+			wantErr:       dataverse.NewDVError(dataverse.ErrVarNotFound, nil),
 			wantResult:    "",
 		},
 		{
@@ -146,7 +146,7 @@ func TestClient_GetResourceGovAddr(t *testing.T) {
 				},
 			},
 			responseError: nil,
-			wantErr:       fmt.Errorf("could not find governance code"),
+			wantErr:       dataverse.NewDVError(dataverse.ErrNoResult, nil),
 			wantResult:    "",
 		},
 		{
@@ -170,7 +170,7 @@ func TestClient_GetResourceGovAddr(t *testing.T) {
 				},
 			},
 			responseError: nil,
-			wantErr:       fmt.Errorf("could not decode governance code"),
+			wantErr:       dataverse.NewDVError(dataverse.ErrType, fmt.Errorf("expected URI, got %T", cgschema.BlankNode{})),
 			wantResult:    "",
 		},
 	}
