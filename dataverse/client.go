@@ -2,7 +2,6 @@ package dataverse
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
@@ -21,7 +20,9 @@ type client struct {
 	cognitariumAddr   string
 }
 
-func NewDataverseClient(ctx context.Context, dataverseClient dvschema.QueryClient, cognitariumClient cgschema.QueryClient) (Client, error) {
+func NewDataverseClient(ctx context.Context,
+	dataverseClient dvschema.QueryClient,
+	cognitariumClient cgschema.QueryClient) (Client, error) {
 	cognitariumAddr, err := getCognitariumAddr(ctx, dataverseClient)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get cognitarium address: %w", err)
@@ -62,8 +63,6 @@ func NewClient(ctx context.Context,
 
 func (c *client) GetResourceGovAddr(_ context.Context, resourceDID string) (string, error) {
 	query := buildGetResourceGovAddrRequest(resourceDID)
-	queryB, _ := json.Marshal(query)
-	fmt.Printf("query : %s", queryB)
 	response, err := c.cognitariumClient.Select(context.Background(), &cgschema.QueryMsg_Select{Query: query})
 	if err != nil {
 		return "", err
