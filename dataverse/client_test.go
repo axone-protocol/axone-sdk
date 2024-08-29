@@ -50,8 +50,10 @@ func TestClient_NewDataverseClient(t *testing.T) {
 					).
 					Times(1)
 
+				mockCognitarium := testutil.NewMockCognitariumQueryClient(controller)
+
 				Convey("When Client is created", func() {
-					client, err := dataverse.NewDataverseClient(context.Background(), mockClient)
+					client, err := dataverse.NewDataverseClient(context.Background(), mockClient, mockCognitarium)
 
 					Convey("Then the client should be created if no error on dataverse client", func() {
 						So(err, ShouldEqual, test.wantErr)

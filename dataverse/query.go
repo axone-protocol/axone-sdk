@@ -1,6 +1,11 @@
 package dataverse
 
-import cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
+import (
+	"fmt"
+	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
+)
+
+const W3IDPrefix = "https://w3id.org/axone/ontology/v4"
 
 func buildGetResourceGovAddrRequest(resource string) cgschema.SelectQuery {
 	limit := 1
@@ -15,12 +20,13 @@ func buildGetResourceGovAddrRequest(resource string) cgschema.SelectQuery {
 	fromGovernance := cgschema.IRI_Prefixed("gov:fromGovernance")
 	govVarOrNodeOrLit := cgschema.VarOrNodeOrLiteral_Variable("gov")
 	govVar := cgschema.VarOrNode_Variable("gov")
+
 	return cgschema.SelectQuery{
 		Limit: &limit,
 		Prefixes: []cgschema.Prefix{
 			{
 				Prefix:    "gov",
-				Namespace: "https://w3id.org/axone/ontology/v4/schema/credential/governance/text/",
+				Namespace: fmt.Sprintf("%s/schema/credential/governance/text/", W3IDPrefix),
 			},
 		},
 		Select: []cgschema.SelectItem{

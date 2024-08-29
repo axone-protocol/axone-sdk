@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
 	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
 	"google.golang.org/grpc"
