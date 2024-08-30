@@ -65,9 +65,9 @@ func NewClient(ctx context.Context,
 	}, nil
 }
 
-func (c *client) GetResourceGovAddr(_ context.Context, resourceDID string) (string, error) {
+func (c *client) GetResourceGovAddr(ctx context.Context, resourceDID string) (string, error) {
 	query := buildGetResourceGovAddrRequest(resourceDID)
-	response, err := c.cognitariumClient.Select(context.Background(), &cgschema.QueryMsg_Select{Query: query})
+	response, err := c.cognitariumClient.Select(ctx, &cgschema.QueryMsg_Select{Query: query})
 	if err != nil {
 		return "", err
 	}
