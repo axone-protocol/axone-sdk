@@ -8,23 +8,14 @@ import (
 
 const W3IDPrefix = "https://w3id.org/axone/ontology/v4"
 
+func ref[T any](v T) *T {
+	return &v
+}
+
 //nolint:funlen
 func buildGetResourceGovAddrRequest(resource string) cgschema.SelectQuery {
-	limit := 1
-	codeVar := cgschema.SelectItem_Variable("code")
-	codeVarOrNodeOrLit := cgschema.VarOrNodeOrLiteral_Variable("code")
-	credIDVar := cgschema.VarOrNode_Variable("credId")
-	resourceIRI := cgschema.IRI_Full(resource)
-	govType := cgschema.IRI_Prefixed("gov:GovernanceTextCredential")
-	claimVar := cgschema.VarOrNode_Variable("claim")
-	claimVarOrNode := cgschema.VarOrNodeOrLiteral_Variable("claim")
-	isGovernedBy := cgschema.IRI_Prefixed("gov:isGovernedBy")
-	fromGovernance := cgschema.IRI_Prefixed("gov:fromGovernance")
-	govVarOrNodeOrLit := cgschema.VarOrNodeOrLiteral_Variable("gov")
-	govVar := cgschema.VarOrNode_Variable("gov")
-
 	return cgschema.SelectQuery{
-		Limit: &limit,
+		Limit: ref(1),
 		Prefixes: []cgschema.Prefix{
 			{
 				Prefix:    "gov",
@@ -33,54 +24,54 @@ func buildGetResourceGovAddrRequest(resource string) cgschema.SelectQuery {
 		},
 		Select: []cgschema.SelectItem{
 			{
-				Variable: &codeVar,
+				Variable: ref(cgschema.SelectItem_Variable("code")),
 			},
 		},
 		Where: cgschema.WhereClause{
 			Bgp: &cgschema.WhereClause_Bgp{
 				Patterns: []cgschema.TriplePattern{
 					{
-						Subject: cgschema.VarOrNode{Variable: &credIDVar},
+						Subject: cgschema.VarOrNode{Variable: ref(cgschema.VarOrNode_Variable("credId"))},
 						Predicate: cgschema.VarOrNamedNode{
 							NamedNode: &cgschema.VarOrNamedNode_NamedNode{Full: &VcBodySubject},
 						},
 						Object: cgschema.VarOrNodeOrLiteral{
 							Node: &cgschema.VarOrNodeOrLiteral_Node{
-								NamedNode: &cgschema.Node_NamedNode{Full: &resourceIRI},
+								NamedNode: &cgschema.Node_NamedNode{Full: ref(cgschema.IRI_Full(resource))},
 							},
 						},
 					},
 					{
-						Subject: cgschema.VarOrNode{Variable: &credIDVar},
+						Subject: cgschema.VarOrNode{Variable: ref(cgschema.VarOrNode_Variable("credId"))},
 						Predicate: cgschema.VarOrNamedNode{
 							NamedNode: &cgschema.VarOrNamedNode_NamedNode{Full: &VcBodyType},
 						},
 						Object: cgschema.VarOrNodeOrLiteral{
 							Node: &cgschema.VarOrNodeOrLiteral_Node{
-								NamedNode: &cgschema.Node_NamedNode{Prefixed: &govType},
+								NamedNode: &cgschema.Node_NamedNode{Prefixed: ref(cgschema.IRI_Prefixed("gov:GovernanceTextCredential"))},
 							},
 						},
 					},
 					{
-						Subject: cgschema.VarOrNode{Variable: &credIDVar},
+						Subject: cgschema.VarOrNode{Variable: ref(cgschema.VarOrNode_Variable("credId"))},
 						Predicate: cgschema.VarOrNamedNode{
 							NamedNode: &cgschema.VarOrNamedNode_NamedNode{Full: &VcBodyClaim},
 						},
-						Object: cgschema.VarOrNodeOrLiteral{Variable: &claimVarOrNode},
+						Object: cgschema.VarOrNodeOrLiteral{Variable: ref(cgschema.VarOrNodeOrLiteral_Variable("claim"))},
 					},
 					{
-						Subject: cgschema.VarOrNode{Variable: &claimVar},
+						Subject: cgschema.VarOrNode{Variable: ref(cgschema.VarOrNode_Variable("claim"))},
 						Predicate: cgschema.VarOrNamedNode{
-							NamedNode: &cgschema.VarOrNamedNode_NamedNode{Prefixed: &isGovernedBy},
+							NamedNode: &cgschema.VarOrNamedNode_NamedNode{Prefixed: ref(cgschema.IRI_Prefixed("gov:isGovernedBy"))},
 						},
-						Object: cgschema.VarOrNodeOrLiteral{Variable: &govVarOrNodeOrLit},
+						Object: cgschema.VarOrNodeOrLiteral{Variable: ref(cgschema.VarOrNodeOrLiteral_Variable("gov"))},
 					},
 					{
-						Subject: cgschema.VarOrNode{Variable: &govVar},
+						Subject: cgschema.VarOrNode{Variable: ref(cgschema.VarOrNode_Variable("gov"))},
 						Predicate: cgschema.VarOrNamedNode{
-							NamedNode: &cgschema.VarOrNamedNode_NamedNode{Prefixed: &fromGovernance},
+							NamedNode: &cgschema.VarOrNamedNode_NamedNode{Prefixed: ref(cgschema.IRI_Prefixed("gov:fromGovernance"))},
 						},
-						Object: cgschema.VarOrNodeOrLiteral{Variable: &codeVarOrNodeOrLit},
+						Object: cgschema.VarOrNodeOrLiteral{Variable: ref(cgschema.VarOrNodeOrLiteral_Variable("code"))},
 					},
 				},
 			},

@@ -10,6 +10,9 @@ import (
 )
 
 type Client interface {
+	// GetResourceGovAddr returns the governance address of a resource.
+	// It queries the cognitarium to get the governance address (law-stone contract address)
+	// of a resource. The resource is identified by its DID.
 	GetResourceGovAddr(context.Context, string) (string, error)
 	ExecGov(context.Context, string, string) (interface{}, error)
 }
