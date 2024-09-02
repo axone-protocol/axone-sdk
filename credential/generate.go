@@ -62,6 +62,7 @@ func (generator *Generator) Generate() (*verifiable.Credential, error) {
 			Suite:                   ecdsasecp256k1signature2019.New(suite.WithSigner(generator.signer)),
 			SignatureRepresentation: verifiable.SignatureJWS,
 			VerificationMethod:      generator.signerDID,
+			Purpose:                 generator.vc.proofPurpose(),
 		}, jsonld.WithDocumentLoader(generator.parser.documentLoader))
 
 		if err != nil {
@@ -75,6 +76,7 @@ func (generator *Generator) Generate() (*verifiable.Credential, error) {
 type Descriptor interface {
 	issuedAt() *time.Time
 	generate() (*bytes.Buffer, error)
+	proofPurpose() string
 }
 
 var _ Descriptor = NewGovernanceVC()
@@ -88,6 +90,10 @@ type GovernanceVCDescriptor struct {
 
 func (g *GovernanceVCDescriptor) issuedAt() *time.Time {
 	return g.issuanceDate
+}
+
+func (g *GovernanceVCDescriptor) proofPurpose() string {
+	return "authentication"
 }
 
 func NewGovernanceVC() *GovernanceVCDescriptor {
