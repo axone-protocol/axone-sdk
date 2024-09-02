@@ -22,16 +22,6 @@ type client struct {
 	cognitariumClient cgschema.QueryClient
 }
 
-func NewDataverseClient(
-	dataverseClient dvschema.QueryClient,
-	cognitariumClient cgschema.QueryClient,
-) (Client, error) {
-	return &client{
-		dataverseClient,
-		cognitariumClient,
-	}, nil
-}
-
 func NewClient(ctx context.Context,
 	grpcAddr, contractAddr string,
 	opts ...grpc.DialOption,
@@ -55,32 +45,6 @@ func NewClient(ctx context.Context,
 		dataverseClient,
 		cognitariumClient,
 	}, nil
-}
-
-func (c *client) GetResourceGovAddr(ctx context.Context, resourceDID string) (string, error) {
-	query := buildGetResourceGovAddrRequest(resourceDID)
-	response, err := c.cognitariumClient.Select(ctx, &cgschema.QueryMsg_Select{Query: query})
-	if err != nil {
-		return "", err
-	}
-
-	if len(response.Results.Bindings) != 1 {
-		return "", NewDVError(ErrNoResult, nil)
-	}
-
-	codeBinding, ok := response.Results.Bindings[0]["code"]
-	if !ok {
-		return "", NewDVError(ErrVarNotFound, nil)
-	}
-	code, ok := codeBinding.ValueType.(cgschema.URI)
-	if !ok {
-		return "", NewDVError(ErrType, fmt.Errorf("expected URI, got %T", codeBinding.ValueType))
-	}
-	return string(*code.Value.Full), nil
-}
-
-func (c *client) ExecGov(_ context.Context, _ string, _ string) (interface{}, error) {
-	panic("not implemented")
 }
 
 func getCognitariumAddr(ctx context.Context, dvClient dvschema.QueryClient) (string, error) {
