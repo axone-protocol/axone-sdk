@@ -3,6 +3,7 @@ package credential_test
 import (
 	"errors"
 	"github.com/axone-protocol/axone-sdk/credential"
+	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 	"time"
@@ -13,6 +14,7 @@ func TestGenerateGovernanceVC(t *testing.T) {
 		name    string
 		vc      credential.Descriptor
 		wantErr error
+		check   func(*verifiable.Credential)
 	}{
 		{
 			name: "Valid governance VC",
@@ -21,13 +23,27 @@ func TestGenerateGovernanceVC(t *testing.T) {
 				WithDatasetDID("datasetID").
 				WithGovAddr("addr").
 				WithIssuanceDate(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
+			check: func(vc *verifiable.Credential) {
+				So(vc.ID, ShouldEqual, "https://w3id.org/axone/ontology/v4/schema/credential/governance/text/id")
+				So(vcSubject(vc).ID, ShouldEqual, "datasetID")
+				So(vc.Issuer.ID, ShouldEqual, "datasetID")
+				So(vcSubject(vc).CustomFields["isGovernedBy"].(map[string]interface{})["fromGovernance"], ShouldEqual, "addr")
+				So(vc.Issued.Time, ShouldEqual, time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC))
+			},
 		},
 		{
 			name: "Valid governance VC without id",
 			vc: credential.NewGovernanceVC().
 				WithDatasetDID("datasetID").
 				WithGovAddr("addr").
-				WithIssuanceDate(time.Now().UTC()),
+				WithIssuanceDate(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
+			check: func(vc *verifiable.Credential) {
+				So(vc.ID, ShouldStartWith, "https://w3id.org/axone/ontology/v4/schema/credential/governance/text/")
+				So(vcSubject(vc).ID, ShouldEqual, "datasetID")
+				So(vc.Issuer.ID, ShouldEqual, "datasetID")
+				So(vcSubject(vc).CustomFields["isGovernedBy"].(map[string]interface{})["fromGovernance"], ShouldEqual, "addr")
+				So(vc.Issued.Time, ShouldEqual, time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC))
+			},
 		},
 		{
 			name: "Valid governance VC without issuance date",
@@ -35,6 +51,13 @@ func TestGenerateGovernanceVC(t *testing.T) {
 				WithID("id").
 				WithDatasetDID("datasetID").
 				WithGovAddr("addr"),
+			check: func(vc *verifiable.Credential) {
+				So(vc.ID, ShouldEqual, "https://w3id.org/axone/ontology/v4/schema/credential/governance/text/id")
+				So(vcSubject(vc).ID, ShouldEqual, "datasetID")
+				So(vc.Issuer.ID, ShouldEqual, "datasetID")
+				So(vcSubject(vc).CustomFields["isGovernedBy"].(map[string]interface{})["fromGovernance"], ShouldEqual, "addr")
+				So(vc.Issued.Time, ShouldHappenWithin, time.Second, time.Now().UTC())
+			},
 		},
 		{
 			name: "Missing dataset id",
@@ -65,15 +88,16 @@ func TestGenerateGovernanceVC(t *testing.T) {
 					WithParser(parser)
 
 				Convey("When a governance VC is generated", func() {
-					buf, err := generator.Generate()
+					vc, err := generator.Generate()
 
 					Convey("Then the governance VC should be generated", func() {
 						if test.wantErr != nil {
 							So(err, ShouldNotBeNil)
 							So(err.Error(), ShouldEqual, test.wantErr.Error())
-							So(buf, ShouldBeNil)
+							So(vc, ShouldBeNil)
 						} else {
-							So(buf, ShouldNotBeNil)
+							So(vc, ShouldNotBeNil)
+							test.check(vc)
 							So(err, ShouldBeNil)
 						}
 					})
@@ -81,4 +105,13 @@ func TestGenerateGovernanceVC(t *testing.T) {
 			})
 		})
 	}
+}
+
+func vcSubject(vc *verifiable.Credential) verifiable.Subject {
+	subjects, ok := vc.Subject.([]verifiable.Subject)
+	if !ok {
+		panic("invalid subject type")
+	}
+
+	return subjects[0]
 }
