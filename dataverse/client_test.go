@@ -6,58 +6,35 @@ import (
 	"testing"
 
 	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
-	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
 	"github.com/axone-protocol/axone-sdk/dataverse"
 	"github.com/axone-protocol/axone-sdk/testutil"
 	. "github.com/smartystreets/goconvey/convey"
 	"go.uber.org/mock/gomock"
 )
 
-func TestClient_NewDataverseClient(t *testing.T) {
+func TestClient_NewClient(t *testing.T) {
 	tests := []struct {
-		name        string
-		returnedErr error
-		wantErr     error
-		wantAddr    string
+		name         string
+		grpcAddr     string
+		contractAddr string
+		wantErr      error
 	}{
 		{
-			name:        "receive an cognitarium address",
-			returnedErr: nil,
-			wantErr:     nil,
-			wantAddr:    "addr",
-		},
-		{
-			name:        "receive an error",
-			returnedErr: fmt.Errorf("error"),
-			wantErr:     fmt.Errorf("failed to get cognitarium address: %w", fmt.Errorf("error")),
-			wantAddr:    "",
+			name:         "should call get cognitarium address with invalid grpc address",
+			grpcAddr:     "invalid",
+			contractAddr: "did:key:zQ3shuwMJ",
+			wantErr:      fmt.Errorf("failed to get cognitarium address"),
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			Convey("Given a mocked dataverse client", t, func() {
-				controller := gomock.NewController(t)
-				defer controller.Finish()
-
-				mockClient := testutil.NewMockDataverseQueryClient(controller)
-				mockClient.EXPECT().
-					Dataverse(gomock.Any(), gomock.Any()).
-					Return(
-						&dvschema.DataverseResponse{
-							TriplestoreAddress: dvschema.Addr(test.wantAddr),
-						},
-						test.returnedErr,
-					).
-					Times(1)
-
-				mockCognitarium := testutil.NewMockCognitariumQueryClient(controller)
-
+			Convey("Given a gRPC addr and contract addr", t, func() {
 				Convey("When Client is created", func() {
-					client, err := dataverse.NewDataverseClient(context.Background(), mockClient, mockCognitarium)
+					client, err := dataverse.NewClient(context.Background(), test.grpcAddr, test.contractAddr)
 
-					Convey("Then the client should be created if no error on dataverse client", func() {
-						So(err, ShouldEqual, test.wantErr)
+					Convey("The client should be created of return an error", func() {
+						So(err.Error(), ShouldContainSubstring, test.wantErr.Error())
 						if test.wantErr == nil {
 							So(client, ShouldNotBeNil)
 						} else {
@@ -182,10 +159,6 @@ func TestClient_GetResourceGovAddr(t *testing.T) {
 				defer controller.Finish()
 
 				mockDataverseClient := testutil.NewMockDataverseQueryClient(controller)
-				mockDataverseClient.EXPECT().
-					Dataverse(gomock.Any(), gomock.Any()).
-					Return(&dvschema.DataverseResponse{TriplestoreAddress: "bar"}, nil).
-					Times(1)
 
 				mockCognitarium := testutil.NewMockCognitariumQueryClient(controller)
 				mockCognitarium.
@@ -194,7 +167,7 @@ func TestClient_GetResourceGovAddr(t *testing.T) {
 					Return(test.response, test.responseError).
 					Times(1)
 
-				client, err := dataverse.NewDataverseClient(context.Background(), mockDataverseClient, mockCognitarium)
+				client, err := dataverse.NewDataverseClient(mockDataverseClient, mockCognitarium)
 				So(err, ShouldBeNil)
 
 				Convey("When GetResourceGovAddr is called", func() {

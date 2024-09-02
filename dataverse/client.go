@@ -20,22 +20,15 @@ type Client interface {
 type client struct {
 	dataverseClient   dvschema.QueryClient
 	cognitariumClient cgschema.QueryClient
-	cognitariumAddr   string
 }
 
-func NewDataverseClient(ctx context.Context,
+func NewDataverseClient(
 	dataverseClient dvschema.QueryClient,
 	cognitariumClient cgschema.QueryClient,
 ) (Client, error) {
-	cognitariumAddr, err := getCognitariumAddr(ctx, dataverseClient)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get cognitarium address: %w", err)
-	}
-
 	return &client{
 		dataverseClient,
 		cognitariumClient,
-		cognitariumAddr,
 	}, nil
 }
 
@@ -61,7 +54,6 @@ func NewClient(ctx context.Context,
 	return &client{
 		dataverseClient,
 		cognitariumClient,
-		cognitariumAddr,
 	}, nil
 }
 
