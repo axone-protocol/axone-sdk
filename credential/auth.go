@@ -45,12 +45,12 @@ func (ac *AuthClaim) From(vc *verifiable.Credential) error {
 var _ Parser[*AuthClaim] = (*AuthParser)(nil)
 
 type AuthParser struct {
-	*CredentialParser
+	*credentialParser
 }
 
 func NewAuthParser(documentLoader ld.DocumentLoader) *AuthParser {
 	return &AuthParser{
-		CredentialParser: &CredentialParser{documentLoader: documentLoader},
+		credentialParser: &credentialParser{documentLoader: documentLoader},
 	}
 }
 

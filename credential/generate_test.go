@@ -2,13 +2,14 @@ package credential_test
 
 import (
 	"errors"
+	"testing"
+	"time"
+
 	"github.com/axone-protocol/axone-sdk/credential"
 	"github.com/axone-protocol/axone-sdk/testutil"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	. "github.com/smartystreets/goconvey/convey"
 	"go.uber.org/mock/gomock"
-	"testing"
-	"time"
 )
 
 func TestGenerateGovernanceVC(t *testing.T) {
@@ -67,7 +68,7 @@ func TestGenerateGovernanceVC(t *testing.T) {
 				WithID("id").
 				WithGovAddr("addr").
 				WithIssuanceDate(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-			wantErr: errors.New("dataset DID is required"),
+			wantErr: credential.NewVCError(credential.ErrGenerate, errors.New("dataset DID is required")),
 		},
 		{
 			name: "Missing gov addr",
@@ -75,7 +76,7 @@ func TestGenerateGovernanceVC(t *testing.T) {
 				WithID("id").
 				WithDatasetDID("datasetID").
 				WithIssuanceDate(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-			wantErr: errors.New("governance address is required"),
+			wantErr: credential.NewVCError(credential.ErrGenerate, errors.New("governance address is required")),
 		},
 	}
 
@@ -140,7 +141,7 @@ func TestGenerator_Generate(t *testing.T) {
 		{
 			name:      "with descriptor error",
 			generator: credential.NewGenerator(credential.NewGovernanceVC().WithDatasetDID("datasetID")),
-			wantErr:   errors.New("governance address is required"),
+			wantErr:   credential.NewVCError(credential.ErrGenerate, errors.New("governance address is required")),
 		},
 		{
 			name: "without signature",

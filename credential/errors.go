@@ -14,6 +14,10 @@ const (
 	ErrExtractClaim      MessageError = "failed to extract claim"
 	ErrParse             MessageError = "failed to parse verifiable credential"
 	ErrMalformed         MessageError = "malformed verifiable credential"
+
+	ErrSign     MessageError = "failed to sign verifiable credential"
+	ErrNoParser MessageError = "no parser provided"
+	ErrGenerate MessageError = "failed to generate verifiable credential"
 )
 
 type VCError struct {

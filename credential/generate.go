@@ -4,14 +4,15 @@ import (
 	"bytes"
 	_ "embed"
 	"errors"
+	"html/template"
+	"time"
+
 	"github.com/axone-protocol/axone-sdk/dataverse"
 	"github.com/google/uuid"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/jsonld"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite/ecdsasecp256k1signature2019"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
-	"html/template"
-	"time"
 )
 
 //go:embed template/vc-gov-tpl.jsonld
@@ -21,7 +22,7 @@ type Generator struct {
 	vc        Descriptor
 	signer    verifiable.Signer
 	signerDID string
-	parser    *CredentialParser
+	parser    *credentialParser
 }
 
 func NewGenerator(descriptor Descriptor) *Generator {
@@ -30,7 +31,7 @@ func NewGenerator(descriptor Descriptor) *Generator {
 	}
 }
 
-func (generator *Generator) WithParser(parser *CredentialParser) *Generator {
+func (generator *Generator) WithParser(parser *credentialParser) *Generator {
 	generator.parser = parser
 	return generator
 }
@@ -44,15 +45,15 @@ func (generator *Generator) WithSignature(signer verifiable.Signer, did string) 
 func (generator *Generator) Generate() (*verifiable.Credential, error) {
 	raw, err := generator.vc.generate()
 	if err != nil {
-		return nil, err // TODO: better err handler
+		return nil, NewVCError(ErrGenerate, err)
 	}
 
 	if generator.parser == nil {
-		return nil, errors.New("no parser provided")
+		return nil, NewVCError(ErrNoParser, nil)
 	}
 	cred, err := generator.parser.parse(raw.Bytes())
 	if err != nil {
-		return nil, err // TODO:
+		return nil, NewVCError(ErrParse, err)
 	}
 
 	if generator.signer != nil {
@@ -64,9 +65,8 @@ func (generator *Generator) Generate() (*verifiable.Credential, error) {
 			VerificationMethod:      generator.signerDID,
 			Purpose:                 generator.vc.proofPurpose(),
 		}, jsonld.WithDocumentLoader(generator.parser.documentLoader))
-
 		if err != nil {
-			return nil, err // TODO:
+			return nil, NewVCError(ErrSign, err)
 		}
 	}
 
@@ -140,7 +140,7 @@ func (g *GovernanceVCDescriptor) prepare() error {
 func (g *GovernanceVCDescriptor) generate() (*bytes.Buffer, error) {
 	err := g.prepare()
 	if err != nil {
-		return nil, err // todo
+		return nil, err
 	}
 
 	tpl, err := template.New("governanceVC").Parse(governanceTemplate)
@@ -157,7 +157,7 @@ func (g *GovernanceVCDescriptor) generate() (*bytes.Buffer, error) {
 		"IssuedAt":        g.issuanceDate.Format(time.RFC3339),
 	})
 	if err != nil {
-		return nil, err // todo
+		return nil, err
 	}
 
 	return &buf, nil
