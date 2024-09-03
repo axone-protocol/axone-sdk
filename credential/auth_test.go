@@ -8,22 +8,8 @@ import (
 	"testing"
 
 	"github.com/axone-protocol/axone-sdk/credential"
-	jld "github.com/hyperledger/aries-framework-go/pkg/doc/ld"
-	"github.com/hyperledger/aries-framework-go/pkg/doc/ldcontext"
-	mockldstore "github.com/hyperledger/aries-framework-go/pkg/mock/ld"
-	mockprovider "github.com/hyperledger/aries-framework-go/pkg/mock/provider"
+	"github.com/axone-protocol/axone-sdk/testutil"
 	. "github.com/smartystreets/goconvey/convey"
-)
-
-var (
-	//go:embed testdata/contexts/credentials-v1.jsonld
-	mockCredentialsV1JSONLD []byte
-	//go:embed testdata/contexts/authentication-v4.jsonld
-	mockAuthenticationV4JSONLD []byte
-	//go:embed testdata/contexts/governance-text-v4.jsonld
-	mockGovernanceTextV4JSONLD []byte
-	//go:embed testdata/contexts/security-v2.jsonld
-	mockSecurityV2JSONLD []byte
 )
 
 func TestAuthParser_ParseSigned(t *testing.T) {
@@ -116,7 +102,7 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 				raw, err := os.ReadFile(test.file)
 				So(err, ShouldBeNil)
 
-				docLoader, err := mockDocumentLoader()
+				docLoader, err := testutil.MockDocumentLoader()
 				So(err, ShouldBeNil)
 
 				parser := credential.NewAuthParser(docLoader)
@@ -137,34 +123,4 @@ func TestAuthParser_ParseSigned(t *testing.T) {
 			})
 		})
 	}
-}
-
-func mockDocumentLoader() (*jld.DocumentLoader, error) {
-	return jld.NewDocumentLoader(createMockCtxProvider(), jld.WithExtraContexts(
-		ldcontext.Document{
-			URL:     "https://w3id.org/axone/ontology/v4/schema/credential/digital-service/authentication/",
-			Content: mockAuthenticationV4JSONLD,
-		},
-		ldcontext.Document{
-			URL:     "https://w3id.org/axone/ontology/v4/schema/credential/governance/text/",
-			Content: mockGovernanceTextV4JSONLD,
-		},
-		ldcontext.Document{
-			URL:     "https://www.w3.org/2018/credentials/v1",
-			Content: mockCredentialsV1JSONLD,
-		},
-		ldcontext.Document{
-			URL:     "https://w3id.org/security/v2",
-			Content: mockSecurityV2JSONLD,
-		},
-	))
-}
-
-func createMockCtxProvider() *mockprovider.Provider {
-	p := &mockprovider.Provider{
-		ContextStoreValue:        mockldstore.NewMockContextStore(),
-		RemoteProviderStoreValue: mockldstore.NewMockRemoteProviderStore(),
-	}
-
-	return p
 }

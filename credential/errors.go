@@ -17,7 +17,7 @@ const (
 
 	ErrSign     MessageError = "failed to sign verifiable credential"
 	ErrNoParser MessageError = "no parser provided"
-	ErrGenerate MessageError = "failed to generate verifiable credential"
+	ErrGenerate MessageError = "failed to Generate verifiable credential"
 )
 
 type VCError struct {

@@ -21,11 +21,15 @@ type Parser[T Claim] interface {
 	ParseSigned(raw []byte) (T, error)
 }
 
-type credentialParser struct {
+type DefaultParser struct {
 	documentLoader ld.DocumentLoader
 }
 
-func (cp *credentialParser) parse(raw []byte) (*verifiable.Credential, error) {
+func NewDefaultParser(documentLoader ld.DocumentLoader) *DefaultParser {
+	return &DefaultParser{documentLoader: documentLoader}
+}
+
+func (cp *DefaultParser) parse(raw []byte) (*verifiable.Credential, error) {
 	vc, err := verifiable.ParseCredential(
 		raw,
 		verifiable.WithJSONLDValidation(),
@@ -38,7 +42,7 @@ func (cp *credentialParser) parse(raw []byte) (*verifiable.Credential, error) {
 	return vc, nil
 }
 
-func (cp *credentialParser) parseSigned(raw []byte) (*verifiable.Credential, error) {
+func (cp *DefaultParser) parseSigned(raw []byte) (*verifiable.Credential, error) {
 	vc, err := verifiable.ParseCredential(
 		raw,
 		verifiable.WithJSONLDValidation(),
