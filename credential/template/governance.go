@@ -4,7 +4,7 @@ import (
 	"bytes"
 	_ "embed"
 	"errors"
-	"text/template"
+	gotemplate "text/template"
 	"time"
 
 	"github.com/axone-protocol/axone-sdk/credential"
@@ -27,9 +27,13 @@ type GovernanceDescriptor struct {
 
 // NewGovernance creates a new governance verifiable credential descriptor.
 // DatasetDID and GovAddr are required. If ID is not provided, it will be generated.
-// If issuance date is not provided, it will be set to the current time at the generation.
+// If issuance date is not provided, it will be set to the current time at descriptor instantiation.
 func NewGovernance() *GovernanceDescriptor {
-	return &GovernanceDescriptor{}
+	t := time.Now().UTC()
+	return &GovernanceDescriptor{
+		id:           uuid.New().String(),
+		issuanceDate: &t,
+	}
 }
 
 func (g *GovernanceDescriptor) WithID(id string) *GovernanceDescriptor {
@@ -52,19 +56,12 @@ func (g *GovernanceDescriptor) WithIssuanceDate(t time.Time) *GovernanceDescript
 	return g
 }
 
-func (g *GovernanceDescriptor) prepare() error {
-	if g.id == "" {
-		g.id = uuid.New().String()
-	}
+func (g *GovernanceDescriptor) validate() error {
 	if g.datasetDID == "" {
 		return errors.New("dataset DID is required")
 	}
 	if g.govAddr == "" {
 		return errors.New("governance address is required")
-	}
-	if g.issuanceDate == nil {
-		t := time.Now().UTC()
-		g.issuanceDate = &t
 	}
 	return nil
 }
@@ -78,12 +75,12 @@ func (g *GovernanceDescriptor) ProofPurpose() string {
 }
 
 func (g *GovernanceDescriptor) Generate() (*bytes.Buffer, error) {
-	err := g.prepare()
+	err := g.validate()
 	if err != nil {
 		return nil, err
 	}
 
-	tpl, err := template.New("governanceVC").Parse(governanceTemplate)
+	tpl, err := gotemplate.New("governanceVC").Parse(governanceTemplate)
 	if err != nil {
 		return nil, err
 	}
