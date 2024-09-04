@@ -20,6 +20,8 @@ var (
 	mockSecurityV2JSONLD []byte
 	//go:embed contexts/dataset-v4.jsonld
 	mockDatasetV4JSONLD []byte
+	//go:embed contexts/publication-v4.jsonld
+	mockPublicationV4JSONLD []byte
 )
 
 func MockDocumentLoader() (*jld.DocumentLoader, error) {
@@ -43,6 +45,10 @@ func MockDocumentLoader() (*jld.DocumentLoader, error) {
 		ldcontext.Document{
 			URL:     "https://w3id.org/axone/ontology/v4/schema/credential/dataset/description/",
 			Content: mockDatasetV4JSONLD,
+		},
+		ldcontext.Document{
+			URL:     "https://w3id.org/axone/ontology/v4/schema/credential/digital-resource/publication/",
+			Content: mockPublicationV4JSONLD,
 		},
 	))
 }

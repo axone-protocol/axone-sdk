@@ -136,10 +136,10 @@ func TestDatasetDescriptor_Generate(t *testing.T) {
 				generator := credential.New(test.vc).
 					WithParser(parser)
 
-				Convey("When a governance VC is generated", func() {
+				Convey("When a dataset VC is generated", func() {
 					vc, err := generator.Generate()
 
-					Convey("Then the governance VC should be generated", func() {
+					Convey("Then the dataset VC should be generated", func() {
 						if test.wantErr != nil {
 							So(err, ShouldNotBeNil)
 							So(err.Error(), ShouldEqual, test.wantErr.Error())
