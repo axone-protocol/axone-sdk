@@ -22,7 +22,7 @@ type Generator struct {
 // Example:
 //
 //	vc, err := credential.New(
-//	    NewGovernanceVC().
+//	    template.NewGovernance().
 //	        WithDatasetDID("did:key:...").
 //	        WithGovAddr("axone1234..."),
 //	).

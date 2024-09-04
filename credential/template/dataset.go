@@ -17,6 +17,8 @@ var datasetTemplate string
 
 var _ credential.Descriptor = NewDataset()
 
+// DatasetDescriptor is a descriptor for generate a dataset description VC.
+// See https://docs.axone.xyz/ontology/next/schemas/credential-dataset-description
 type DatasetDescriptor struct {
 	id           string
 	datasetDID   string

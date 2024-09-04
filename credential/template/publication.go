@@ -17,6 +17,8 @@ var publicationTemplate string
 
 var _ credential.Descriptor = NewPublication()
 
+// PublicationDescriptor is a descriptor for generate a digital resource publication VC.
+// See https://docs.axone.xyz/ontology/next/schemas/credential-digital-resource-publication
 type PublicationDescriptor struct {
 	id           string
 	datasetDID   string

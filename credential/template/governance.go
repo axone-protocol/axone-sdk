@@ -17,7 +17,8 @@ var governanceTemplate string
 
 var _ credential.Descriptor = NewGovernance()
 
-// GovernanceDescriptor is a descriptor for a governance verifiable credential.
+// GovernanceDescriptor is a descriptor for generate a credential governance text VC.
+// See https://docs.axone.xyz/ontology/next/schemas/credential-governance-text
 type GovernanceDescriptor struct {
 	id           string
 	datasetDID   string
