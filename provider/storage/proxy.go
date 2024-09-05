@@ -20,7 +20,7 @@ const (
 )
 
 type Proxy struct {
-	key       *keys.Key
+	key       keys.Keyring
 	baseURL   string
 	dvClient  dataverse.Client
 	authProxy auth.Proxy
@@ -34,14 +34,14 @@ type Proxy struct {
 
 func NewProxy(
 	ctx context.Context,
-	key *keys.Key,
+	key keys.Keyring,
 	baseURL string,
 	dvClient dataverse.Client,
 	documentLoader ld.DocumentLoader,
 	readFn func(context.Context, string) (io.Reader, error),
 	storeFn func(context.Context, string, io.Reader) error,
 ) (*Proxy, error) {
-	gov, err := dvClient.GetResourceGovAddr(ctx, key.DID)
+	gov, err := dvClient.GetResourceGovAddr(ctx, key.DID())
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func NewProxy(
 		key:       key,
 		baseURL:   baseURL,
 		dvClient:  dvClient,
-		authProxy: auth.NewProxy(gov, key.DID, dvClient, credential.NewAuthParser(documentLoader)),
+		authProxy: auth.NewProxy(gov, key.DID(), dvClient, credential.NewAuthParser(documentLoader)),
 		vcParser:  credential.NewDefaultParser(documentLoader),
 		readFn:    readFn,
 		storeFn:   storeFn,
@@ -75,7 +75,8 @@ func (p *Proxy) Read(ctx context.Context, id *auth.Identity, resourceID string) 
 		return nil, err
 	}
 
-	ok, err := p.dvClient.AskGovTellAction(ctx, govAddr, p.key.DID, readAction)
+	ok, err := p.dvClient.AskGovTellAction(ctx, govAddr, p.key.DID(), readAction)
+
 	if err != nil {
 		return nil, err
 	}
@@ -97,9 +98,9 @@ func (p *Proxy) Store(ctx context.Context, id *auth.Identity, resourceID string,
 	}
 
 	vc, err := credential.New(
-		template.NewPublication(resourceID, p.baseURL+resourceID, p.key.DID),
+		template.NewPublication(resourceID, p.baseURL+resourceID, p.key.DID()),
 		credential.WithParser(p.vcParser),
-		credential.WithSigner(p.key, p.key.DID),
+		credential.WithSigner(p.key, p.key.DID()),
 	).Generate()
 	if err != nil {
 		return nil, err

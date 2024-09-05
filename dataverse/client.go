@@ -3,6 +3,7 @@ package dataverse
 import (
 	"context"
 	"fmt"
+	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 
 	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
 	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
@@ -30,6 +31,8 @@ type Client interface {
 	// ```
 	// The function returns true if Result is 'permitted', false otherwise.
 	AskGovTellAction(context.Context, string, string, string) (bool, error)
+
+	SubmitClaims(ctx context.Context, credential *verifiable.Credential)
 }
 
 type LawStoneFactory func(string) (lsschema.QueryClient, error)
@@ -38,6 +41,10 @@ type client struct {
 	dataverseClient   dvschema.QueryClient
 	cognitariumClient cgschema.QueryClient
 	lawStoneFactory   LawStoneFactory
+}
+
+func (c *client) SubmitClaims(_ context.Context, _ *verifiable.Credential) {
+	panic("implement me")
 }
 
 func NewClient(ctx context.Context,
