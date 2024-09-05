@@ -3,7 +3,6 @@ package template
 import (
 	"bytes"
 	_ "embed"
-	"errors"
 	gotemplate "text/template"
 	"time"
 
@@ -15,7 +14,7 @@ import (
 //go:embed vc-gov-tpl.jsonld
 var governanceTemplate string
 
-var _ credential.Descriptor = NewGovernance()
+var _ credential.Descriptor = &GovernanceDescriptor{}
 
 // GovernanceDescriptor is a descriptor for generate a credential governance text VC.
 // See https://docs.axone.xyz/ontology/next/schemas/credential-governance-text
@@ -29,42 +28,26 @@ type GovernanceDescriptor struct {
 // NewGovernance creates a new governance verifiable credential descriptor.
 // DatasetDID and GovAddr are required. If ID is not provided, it will be generated.
 // If issuance date is not provided, it will be set to the current time at descriptor instantiation.
-func NewGovernance() *GovernanceDescriptor {
+func NewGovernance(datasetDID, govAddr string, opts ...Option[*GovernanceDescriptor]) *GovernanceDescriptor {
 	t := time.Now().UTC()
-	return &GovernanceDescriptor{
+	g := &GovernanceDescriptor{
 		id:           uuid.New().String(),
+		datasetDID:   datasetDID,
+		govAddr:      govAddr,
 		issuanceDate: &t,
 	}
+	for _, opt := range opts {
+		opt(g)
+	}
+	return g
 }
 
-func (g *GovernanceDescriptor) WithID(id string) *GovernanceDescriptor {
+func (g *GovernanceDescriptor) setID(id string) {
 	g.id = id
-	return g
 }
 
-func (g *GovernanceDescriptor) WithDatasetDID(did string) *GovernanceDescriptor {
-	g.datasetDID = did
-	return g
-}
-
-func (g *GovernanceDescriptor) WithGovAddr(addr string) *GovernanceDescriptor {
-	g.govAddr = addr
-	return g
-}
-
-func (g *GovernanceDescriptor) WithIssuanceDate(t time.Time) *GovernanceDescriptor {
+func (g *GovernanceDescriptor) setIssuanceDate(t time.Time) {
 	g.issuanceDate = &t
-	return g
-}
-
-func (g *GovernanceDescriptor) validate() error {
-	if g.datasetDID == "" {
-		return errors.New("dataset DID is required")
-	}
-	if g.govAddr == "" {
-		return errors.New("governance address is required")
-	}
-	return nil
 }
 
 func (g *GovernanceDescriptor) IssuedAt() *time.Time {
@@ -76,11 +59,6 @@ func (g *GovernanceDescriptor) ProofPurpose() string {
 }
 
 func (g *GovernanceDescriptor) Generate() (*bytes.Buffer, error) {
-	err := g.validate()
-	if err != nil {
-		return nil, err
-	}
-
 	tpl, err := gotemplate.New("governanceVC").Parse(governanceTemplate)
 	if err != nil {
 		return nil, err

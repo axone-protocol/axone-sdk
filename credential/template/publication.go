@@ -3,7 +3,6 @@ package template
 import (
 	"bytes"
 	_ "embed"
-	"errors"
 	gotemplate "text/template"
 	"time"
 
@@ -15,7 +14,7 @@ import (
 //go:embed vc-publication-tpl.jsonld
 var publicationTemplate string
 
-var _ credential.Descriptor = NewPublication()
+var _ credential.Descriptor = &PublicationDescriptor{}
 
 // PublicationDescriptor is a descriptor for generate a digital resource publication VC.
 // See https://docs.axone.xyz/ontology/next/schemas/credential-digital-resource-publication
@@ -27,50 +26,29 @@ type PublicationDescriptor struct {
 	issuanceDate *time.Time
 }
 
-func NewPublication() *PublicationDescriptor {
+func NewPublication(datasetDID, datasetURI, storageDID string,
+	opts ...Option[*PublicationDescriptor],
+) *PublicationDescriptor {
 	t := time.Now().UTC()
-	return &PublicationDescriptor{
+	p := &PublicationDescriptor{
 		id:           uuid.New().String(),
+		datasetDID:   datasetDID,
+		datasetURI:   datasetURI,
+		storageDID:   storageDID,
 		issuanceDate: &t,
 	}
+	for _, opt := range opts {
+		opt(p)
+	}
+	return p
 }
 
-func (d *PublicationDescriptor) WithID(id string) *PublicationDescriptor {
+func (d *PublicationDescriptor) setID(id string) {
 	d.id = id
-	return d
 }
 
-func (d *PublicationDescriptor) WithDatasetDID(did string) *PublicationDescriptor {
-	d.datasetDID = did
-	return d
-}
-
-func (d *PublicationDescriptor) WithDatasetURI(uri string) *PublicationDescriptor {
-	d.datasetURI = uri
-	return d
-}
-
-func (d *PublicationDescriptor) WithStorageDID(did string) *PublicationDescriptor {
-	d.storageDID = did
-	return d
-}
-
-func (d *PublicationDescriptor) WithIssuanceDate(t time.Time) *PublicationDescriptor {
+func (d *PublicationDescriptor) setIssuanceDate(t time.Time) {
 	d.issuanceDate = &t
-	return d
-}
-
-func (d *PublicationDescriptor) validate() error {
-	if d.datasetDID == "" {
-		return errors.New("dataset DID is required")
-	}
-	if d.datasetURI == "" {
-		return errors.New("dataset URI is required")
-	}
-	if d.storageDID == "" {
-		return errors.New("storage DID is required")
-	}
-	return nil
 }
 
 func (d *PublicationDescriptor) IssuedAt() *time.Time {
@@ -82,11 +60,6 @@ func (d *PublicationDescriptor) ProofPurpose() string {
 }
 
 func (d *PublicationDescriptor) Generate() (*bytes.Buffer, error) {
-	err := d.validate()
-	if err != nil {
-		return nil, err
-	}
-
 	tpl, err := gotemplate.New("publicationVC").Parse(publicationTemplate)
 	if err != nil {
 		return nil, err

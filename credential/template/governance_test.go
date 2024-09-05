@@ -1,7 +1,6 @@
 package template
 
 import (
-	"errors"
 	"testing"
 	"time"
 
@@ -20,11 +19,12 @@ func TestGovernanceDescriptor_Generate(t *testing.T) {
 	}{
 		{
 			name: "Valid governance VC",
-			vc: NewGovernance().
-				WithID("id").
-				WithDatasetDID("datasetID").
-				WithGovAddr("addr").
-				WithIssuanceDate(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
+			vc: NewGovernance(
+				"datasetID",
+				"addr",
+				WithID[*GovernanceDescriptor]("id"),
+				WithIssuanceDate[*GovernanceDescriptor](time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
+			),
 			check: func(vc *verifiable.Credential) {
 				So(vc.ID, ShouldEqual, "https://w3id.org/axone/ontology/v4/schema/credential/governance/text/id")
 				So(vcSubject(vc).ID, ShouldEqual, "datasetID")
@@ -34,48 +34,18 @@ func TestGovernanceDescriptor_Generate(t *testing.T) {
 			},
 		},
 		{
-			name: "Valid governance VC without id",
-			vc: NewGovernance().
-				WithDatasetDID("datasetID").
-				WithGovAddr("addr").
-				WithIssuanceDate(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
+			name: "Valid governance VC with default value",
+			vc: NewGovernance(
+				"datasetID",
+				"addr",
+			),
 			check: func(vc *verifiable.Credential) {
 				So(vc.ID, ShouldStartWith, "https://w3id.org/axone/ontology/v4/schema/credential/governance/text/")
 				So(vcSubject(vc).ID, ShouldEqual, "datasetID")
 				So(vc.Issuer.ID, ShouldEqual, "datasetID")
 				So(vcSubject(vc).CustomFields["isGovernedBy"].(map[string]interface{})["fromGovernance"], ShouldEqual, "addr")
-				So(vc.Issued.Time, ShouldEqual, time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC))
-			},
-		},
-		{
-			name: "Valid governance VC without issuance date",
-			vc: NewGovernance().
-				WithID("id").
-				WithDatasetDID("datasetID").
-				WithGovAddr("addr"),
-			check: func(vc *verifiable.Credential) {
-				So(vc.ID, ShouldEqual, "https://w3id.org/axone/ontology/v4/schema/credential/governance/text/id")
-				So(vcSubject(vc).ID, ShouldEqual, "datasetID")
-				So(vc.Issuer.ID, ShouldEqual, "datasetID")
-				So(vcSubject(vc).CustomFields["isGovernedBy"].(map[string]interface{})["fromGovernance"], ShouldEqual, "addr")
 				So(vc.Issued.Time, ShouldHappenWithin, time.Second, time.Now().UTC())
 			},
-		},
-		{
-			name: "Missing dataset id",
-			vc: NewGovernance().
-				WithID("id").
-				WithGovAddr("addr").
-				WithIssuanceDate(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-			wantErr: credential.NewVCError(credential.ErrGenerate, errors.New("dataset DID is required")),
-		},
-		{
-			name: "Missing gov addr",
-			vc: NewGovernance().
-				WithID("id").
-				WithDatasetDID("datasetID").
-				WithIssuanceDate(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-			wantErr: credential.NewVCError(credential.ErrGenerate, errors.New("governance address is required")),
 		},
 	}
 
@@ -87,7 +57,7 @@ func TestGovernanceDescriptor_Generate(t *testing.T) {
 
 				parser := credential.NewDefaultParser(docLoader)
 				generator := credential.New(
-                    test.vc,
+					test.vc,
 					credential.WithParser(parser))
 
 				Convey("When a governance VC is generated", func() {

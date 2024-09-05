@@ -3,7 +3,6 @@ package template
 import (
 	"bytes"
 	_ "embed"
-	"errors"
 	gotemplate "text/template"
 	"time"
 
@@ -15,7 +14,7 @@ import (
 //go:embed vc-desc-tpl.jsonld
 var datasetTemplate string
 
-var _ credential.Descriptor = NewDataset()
+var _ credential.Descriptor = &DatasetDescriptor{}
 
 // DatasetDescriptor is a descriptor for generate a dataset description VC.
 // See https://docs.axone.xyz/ontology/next/schemas/credential-dataset-description
@@ -30,62 +29,42 @@ type DatasetDescriptor struct {
 	issuanceDate *time.Time
 }
 
-func NewDataset() *DatasetDescriptor {
+func NewDataset(datasetDID, title string, opts ...Option[*DatasetDescriptor]) *DatasetDescriptor {
 	t := time.Now().UTC()
-	return &DatasetDescriptor{
+	d := &DatasetDescriptor{
 		id:           uuid.New().String(),
+		datasetDID:   datasetDID,
+		title:        title,
 		issuanceDate: &t,
 	}
+	for _, opt := range opts {
+		opt(d)
+	}
+	return d
 }
 
-func (d *DatasetDescriptor) WithID(id string) *DatasetDescriptor {
+func (d *DatasetDescriptor) setID(id string) {
 	d.id = id
-	return d
 }
 
-func (d *DatasetDescriptor) WithDatasetDID(did string) *DatasetDescriptor {
-	d.datasetDID = did
-	return d
-}
-
-func (d *DatasetDescriptor) WithTitle(title string) *DatasetDescriptor {
-	d.title = title
-	return d
-}
-
-func (d *DatasetDescriptor) WithDescription(description string) *DatasetDescriptor {
+func (d *DatasetDescriptor) setDescription(description string) {
 	d.description = description
-	return d
 }
 
-func (d *DatasetDescriptor) WithFormat(format string) *DatasetDescriptor {
+func (d *DatasetDescriptor) setFormat(format string) {
 	d.format = format
-	return d
 }
 
-func (d *DatasetDescriptor) WithTags(tags []string) *DatasetDescriptor {
+func (d *DatasetDescriptor) setTags(tags []string) {
 	d.tags = tags
-	return d
 }
 
-func (d *DatasetDescriptor) WithTopic(topic string) *DatasetDescriptor {
+func (d *DatasetDescriptor) setTopic(topic string) {
 	d.topic = topic
-	return d
 }
 
-func (d *DatasetDescriptor) WithIssuanceDate(t time.Time) *DatasetDescriptor {
+func (d *DatasetDescriptor) setIssuanceDate(t time.Time) {
 	d.issuanceDate = &t
-	return d
-}
-
-func (d *DatasetDescriptor) validate() error {
-	if d.datasetDID == "" {
-		return errors.New("dataset DID is required")
-	}
-	if d.title == "" {
-		return errors.New("title is required")
-	}
-	return nil
 }
 
 func (d *DatasetDescriptor) IssuedAt() *time.Time {
@@ -97,11 +76,6 @@ func (d *DatasetDescriptor) ProofPurpose() string {
 }
 
 func (d *DatasetDescriptor) Generate() (*bytes.Buffer, error) {
-	err := d.validate()
-	if err != nil {
-		return nil, err
-	}
-
 	tpl, err := gotemplate.New("datasetDescriptionVC").Parse(datasetTemplate)
 	if err != nil {
 		return nil, err

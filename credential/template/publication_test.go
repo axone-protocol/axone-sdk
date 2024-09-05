@@ -1,7 +1,6 @@
 package template
 
 import (
-	"errors"
 	"testing"
 	"time"
 
@@ -20,12 +19,13 @@ func TestPublicationDescriptor_Generate(t *testing.T) {
 	}{
 		{
 			name: "Valid publication VC",
-			vc: NewPublication().
-				WithID("id").
-				WithDatasetDID("datasetID").
-				WithDatasetURI("datasetURI").
-				WithStorageDID("storageID").
-				WithIssuanceDate(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
+			vc: NewPublication(
+				"datasetID",
+				"datasetURI",
+				"storageID",
+				WithID[*PublicationDescriptor]("id"),
+				WithIssuanceDate[*PublicationDescriptor](time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
+			),
 			check: func(vc *verifiable.Credential) {
 				So(vc.ID, ShouldEqual, "https://w3id.org/axone/ontology/v4/schema/credential/digital-resource/publication/id")
 				So(vcSubject(vc).ID, ShouldEqual, "datasetID")
@@ -36,11 +36,12 @@ func TestPublicationDescriptor_Generate(t *testing.T) {
 			},
 		},
 		{
-			name: "Valid publication VC with default issuance date and default id",
-			vc: NewPublication().
-				WithDatasetDID("datasetID").
-				WithDatasetURI("datasetURI").
-				WithStorageDID("storageID"),
+			name: "Valid publication VC with default value",
+			vc: NewPublication(
+				"datasetID",
+				"datasetURI",
+				"storageID",
+			),
 			check: func(vc *verifiable.Credential) {
 				So(vc.ID, ShouldStartWith, "https://w3id.org/axone/ontology/v4/schema/credential/digital-resource/publication/")
 				So(vcSubject(vc).ID, ShouldEqual, "datasetID")
@@ -49,33 +50,6 @@ func TestPublicationDescriptor_Generate(t *testing.T) {
 				So(vcSubject(vc).CustomFields["servedBy"], ShouldEqual, "storageID")
 				So(vc.Issued.Time, ShouldHappenWithin, time.Second, time.Now().UTC())
 			},
-		},
-		{
-			name: "Missing dataset DID",
-			vc: NewPublication().
-				WithID("id").
-				WithDatasetURI("datasetURI").
-				WithStorageDID("storageID").
-				WithIssuanceDate(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-			wantErr: credential.NewVCError(credential.ErrGenerate, errors.New("dataset DID is required")),
-		},
-		{
-			name: "Missing storage DID",
-			vc: NewPublication().
-				WithID("id").
-				WithDatasetDID("datasetID").
-				WithDatasetURI("datasetURI").
-				WithIssuanceDate(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-			wantErr: credential.NewVCError(credential.ErrGenerate, errors.New("storage DID is required")),
-		},
-		{
-			name: "Missing dataset URI",
-			vc: NewPublication().
-				WithID("id").
-				WithDatasetDID("datasetID").
-				WithStorageDID("storageID").
-				WithIssuanceDate(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-			wantErr: credential.NewVCError(credential.ErrGenerate, errors.New("dataset URI is required")),
 		},
 	}
 
@@ -87,7 +61,7 @@ func TestPublicationDescriptor_Generate(t *testing.T) {
 
 				parser := credential.NewDefaultParser(docLoader)
 				generator := credential.New(
-                    test.vc,
+					test.vc,
 					credential.WithParser(parser))
 
 				Convey("When a publication VC is generated", func() {

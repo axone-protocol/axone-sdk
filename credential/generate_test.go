@@ -28,17 +28,12 @@ func TestGenerator_Generate(t *testing.T) {
 	}{
 		{
 			name:      "without parser",
-			generator: credential.New(template.NewGovernance().WithDatasetDID("datasetID").WithGovAddr("addr")),
+			generator: credential.New(template.NewGovernance("datasetID", "addr")),
 			wantErr:   errors.New("no parser provided"),
 		},
 		{
-			name:      "with descriptor error",
-			generator: credential.New(template.NewGovernance().WithDatasetDID("datasetID")),
-			wantErr:   credential.NewVCError(credential.ErrGenerate, errors.New("governance address is required")),
-		},
-		{
 			name: "without signature",
-			generator: credential.New(template.NewGovernance().WithDatasetDID("datasetID").WithGovAddr("addr"),
+			generator: credential.New(template.NewGovernance("datasetID", "addr"),
 				credential.WithParser(credential.NewDefaultParser(loader))),
 			wantErr: nil,
 			check: func(vc *verifiable.Credential) {
@@ -47,7 +42,7 @@ func TestGenerator_Generate(t *testing.T) {
 		},
 		{
 			name: "with signature",
-			generator: credential.New(template.NewGovernance().WithDatasetDID("datasetID").WithGovAddr("addr"),
+			generator: credential.New(template.NewGovernance("datasetID", "addr"),
 				credential.WithParser(credential.NewDefaultParser(loader)), credential.WithSigner(mockSigner, "did:example:123")),
 			wantErr: nil,
 			check: func(vc *verifiable.Credential) {
