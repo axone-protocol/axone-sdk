@@ -38,8 +38,8 @@ func TestGenerator_Generate(t *testing.T) {
 		},
 		{
 			name: "without signature",
-			generator: credential.New(template.NewGovernance().WithDatasetDID("datasetID").WithGovAddr("addr")).
-				WithParser(credential.NewDefaultParser(loader)),
+			generator: credential.New(template.NewGovernance().WithDatasetDID("datasetID").WithGovAddr("addr"),
+				credential.WithParser(credential.NewDefaultParser(loader))),
 			wantErr: nil,
 			check: func(vc *verifiable.Credential) {
 				So(len(vc.Proofs), ShouldEqual, 0)
@@ -47,9 +47,8 @@ func TestGenerator_Generate(t *testing.T) {
 		},
 		{
 			name: "with signature",
-			generator: credential.New(template.NewGovernance().WithDatasetDID("datasetID").WithGovAddr("addr")).
-				WithParser(credential.NewDefaultParser(loader)).
-				WithSignature(mockSigner, "did:example:123"),
+			generator: credential.New(template.NewGovernance().WithDatasetDID("datasetID").WithGovAddr("addr"),
+				credential.WithParser(credential.NewDefaultParser(loader)), credential.WithSigner(mockSigner, "did:example:123")),
 			wantErr: nil,
 			check: func(vc *verifiable.Credential) {
 				So(len(vc.Proofs), ShouldEqual, 1)

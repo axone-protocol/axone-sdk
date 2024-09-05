@@ -29,21 +29,30 @@ type Generator struct {
 //	WithParser(parser).
 //	WithSignature(signer, "did:key:..."). // Signature is optional and Generate a not signed VC if not provided.
 //	Generate()
-func New(descriptor Descriptor) *Generator {
-	return &Generator{
+func New(descriptor Descriptor, opts ...Option) *Generator {
+	g := &Generator{
 		vc: descriptor,
+	}
+	for _, opt := range opts {
+		opt(g)
+	}
+	return g
+}
+
+// Option is a function that configures a Generator.
+type Option func(*Generator)
+
+func WithParser(parser *DefaultParser) Option {
+	return func(g *Generator) {
+		g.parser = parser
 	}
 }
 
-func (generator *Generator) WithParser(parser *DefaultParser) *Generator {
-	generator.parser = parser
-	return generator
-}
-
-func (generator *Generator) WithSignature(signer verifiable.Signer, did string) *Generator {
-	generator.signer = signer
-	generator.signerDID = did
-	return generator
+func WithSigner(signer verifiable.Signer, did string) Option {
+	return func(g *Generator) {
+		g.signer = signer
+		g.signerDID = did
+	}
 }
 
 func (generator *Generator) Generate() (*verifiable.Credential, error) {

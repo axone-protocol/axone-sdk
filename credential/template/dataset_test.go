@@ -133,8 +133,9 @@ func TestDatasetDescriptor_Generate(t *testing.T) {
 				So(err, ShouldBeNil)
 
 				parser := credential.NewDefaultParser(docLoader)
-				generator := credential.New(test.vc).
-					WithParser(parser)
+				generator := credential.New(
+					test.vc,
+					credential.WithParser(parser))
 
 				Convey("When a dataset VC is generated", func() {
 					vc, err := generator.Generate()
