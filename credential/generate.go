@@ -21,14 +21,15 @@ type Generator struct {
 // New allow to Generate a verifiable credential with the given credential descriptor.
 // Example:
 //
-//	vc, err := credential.New(
-//	    template.NewGovernance().
-//	        WithDatasetDID("did:key:...").
-//	        WithGovAddr("axone1234..."),
-//	).
-//	WithParser(parser).
-//	WithSignature(signer, "did:key:..."). // Signature is optional and Generate a not signed VC if not provided.
-//	Generate()
+//		vc, err := credential.New(
+//		    template.NewGovernance(
+//					"datasetID",
+//					"addr",
+//					WithID[*GovernanceDescriptor]("id")
+//	     ),
+//		    WithParser(parser),
+//		    WithSignature(signer, "did:key:...")). // Signature is optional and Generate a not signed VC if not provided.
+//		Generate()
 func New(descriptor Descriptor, opts ...Option) *Generator {
 	g := &Generator{
 		vc: descriptor,
