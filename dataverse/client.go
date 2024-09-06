@@ -2,8 +2,10 @@ package dataverse
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
+	"github.com/piprate/json-gold/ld"
 
 	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
 	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
@@ -32,7 +34,7 @@ type Client interface {
 	// The function returns true if Result is 'permitted', false otherwise.
 	AskGovTellAction(context.Context, string, string, string) (bool, error)
 
-	SubmitClaims(ctx context.Context, credential *verifiable.Credential)
+	SubmitClaims(ctx context.Context, credential *verifiable.Credential) error
 }
 
 type LawStoneFactory func(string) (lsschema.QueryClient, error)
@@ -41,10 +43,6 @@ type client struct {
 	dataverseClient   dvschema.QueryClient
 	cognitariumClient cgschema.QueryClient
 	lawStoneFactory   LawStoneFactory
-}
-
-func (c *client) SubmitClaims(_ context.Context, _ *verifiable.Credential) {
-	panic("implement me")
 }
 
 func NewClient(ctx context.Context,
@@ -73,6 +71,29 @@ func NewClient(ctx context.Context,
 			return lsschema.NewQueryClient(grpcAddr, addr, opts...)
 		},
 	}, nil
+}
+
+func (c *client) SubmitClaims(_ context.Context, vc *verifiable.Credential) error {
+	proc := ld.NewJsonLdProcessor()
+	options := ld.NewJsonLdOptions("")
+	options.Format = "application/n-quads"
+
+	vcRaw, err := json.Marshal(vc)
+	if err != nil {
+		return err
+	}
+
+	var vcJSON interface{}
+	err = json.Unmarshal(vcRaw, &vcJSON)
+	if err != nil {
+		return err
+	}
+	rdf, err := proc.ToRDF(vcJSON, options)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("rdf: %s\n", rdf)
+	return nil
 }
 
 func getCognitariumAddr(ctx context.Context, dvClient dvschema.QueryClient) (string, error) {
