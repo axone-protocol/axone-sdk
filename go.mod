@@ -5,6 +5,7 @@ go 1.22.5
 require (
 	github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5 v5.0.0-20240826124342-6e6abdf73c9a
 	github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 v5.0.0-20240826124342-6e6abdf73c9a
+	github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5 v5.0.0-20240829161824-0ad316c6fda9
 	github.com/axone-protocol/axoned/v9 v9.0.0
 	github.com/btcsuite/btcd v0.22.0-beta
 	github.com/cosmos/cosmos-sdk v0.50.9

@@ -49,14 +49,13 @@ func (a *authProxy) Authenticate(ctx context.Context, credential []byte) (*Ident
 		return nil, fmt.Errorf("credential not intended for this service: `%s` (target: `%s`)", a.serviceID, authClaim.ToService)
 	}
 
-	// TODO: get authorized actions from governance, ex:
-	res, err := a.dvClient.ExecGov(ctx, a.govAddr, fmt.Sprintf("can(Action,'%s').", authClaim.ID))
+	actions, err := a.dvClient.AskGovPermittedActions(ctx, a.govAddr, authClaim.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to query governance for permitted actions: %w", err)
 	}
 
 	return &Identity{
 		DID:               authClaim.ID,
-		AuthorizedActions: res.([]string),
+		AuthorizedActions: actions,
 	}, nil
 }

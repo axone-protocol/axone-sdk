@@ -39,19 +39,34 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 	return m.recorder
 }
 
-// ExecGov mocks base method.
-func (m *MockClient) ExecGov(arg0 context.Context, arg1, arg2 string) (any, error) {
+// AskGovPermittedActions mocks base method.
+func (m *MockClient) AskGovPermittedActions(arg0 context.Context, arg1, arg2 string) ([]string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ExecGov", arg0, arg1, arg2)
-	ret0, _ := ret[0].(any)
+	ret := m.ctrl.Call(m, "AskGovPermittedActions", arg0, arg1, arg2)
+	ret0, _ := ret[0].([]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ExecGov indicates an expected call of ExecGov.
-func (mr *MockClientMockRecorder) ExecGov(arg0, arg1, arg2 any) *gomock.Call {
+// AskGovPermittedActions indicates an expected call of AskGovPermittedActions.
+func (mr *MockClientMockRecorder) AskGovPermittedActions(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecGov", reflect.TypeOf((*MockClient)(nil).ExecGov), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AskGovPermittedActions", reflect.TypeOf((*MockClient)(nil).AskGovPermittedActions), arg0, arg1, arg2)
+}
+
+// AskGovTellAction mocks base method.
+func (m *MockClient) AskGovTellAction(arg0 context.Context, arg1, arg2, arg3 string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AskGovTellAction", arg0, arg1, arg2, arg3)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AskGovTellAction indicates an expected call of AskGovTellAction.
+func (mr *MockClientMockRecorder) AskGovTellAction(arg0, arg1, arg2, arg3 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AskGovTellAction", reflect.TypeOf((*MockClient)(nil).AskGovTellAction), arg0, arg1, arg2, arg3)
 }
 
 // GetResourceGovAddr mocks base method.

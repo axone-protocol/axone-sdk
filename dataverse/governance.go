@@ -3,8 +3,10 @@ package dataverse
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
+	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
 )
 
 func (c *client) GetResourceGovAddr(ctx context.Context, resourceDID string) (string, error) {
@@ -29,6 +31,51 @@ func (c *client) GetResourceGovAddr(ctx context.Context, resourceDID string) (st
 	return string(*code.Value.Full), nil
 }
 
-func (c *client) ExecGov(_ context.Context, _ string, _ string) (interface{}, error) {
-	panic("not implemented")
+func (c *client) AskGovPermittedActions(ctx context.Context, addr, did string) ([]string, error) {
+	gov, err := c.lawStoneFactory(addr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create law-stone client: %w", err)
+	}
+
+	response, err := gov.Ask(ctx, &lsschema.QueryMsg_Ask{Query: fmt.Sprintf("tell_permitted_actions('%s',Actions).", did)})
+	if err != nil {
+		return nil, fmt.Errorf("failed to query law-stone contract: %w", err)
+	}
+
+	if len(response.Answer.Results) != 1 {
+		return nil, nil
+	}
+	if len(response.Answer.Results[0].Substitutions) != 1 {
+		return nil, nil
+	}
+
+	result := response.Answer.Results[0].Substitutions[0].Expression
+	result = result[1 : len(result)-1]
+	var actions []string
+	for _, action := range strings.Split(result, ",") {
+		actions = append(actions, strings.Trim(action, "'"))
+	}
+
+	return actions, nil
+}
+
+func (c *client) AskGovTellAction(ctx context.Context, addr, did, action string) (bool, error) {
+	gov, err := c.lawStoneFactory(addr)
+	if err != nil {
+		return false, fmt.Errorf("failed to create law-stone client: %w", err)
+	}
+
+	response, err := gov.Ask(ctx, &lsschema.QueryMsg_Ask{Query: fmt.Sprintf("tell('%s','%s',Result,_).", did, action)})
+	if err != nil {
+		return false, fmt.Errorf("failed to query law-stone contract: %w", err)
+	}
+
+	if len(response.Answer.Results) != 1 {
+		return false, nil
+	}
+	if len(response.Answer.Results[0].Substitutions) != 1 {
+		return false, nil
+	}
+
+	return response.Answer.Results[0].Substitutions[0].Expression == "permitted", nil
 }
