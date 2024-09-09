@@ -3,10 +3,10 @@ package dataverse
 import (
 	"context"
 	"fmt"
-	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
 
 	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
 	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
+	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
 	"google.golang.org/grpc"
 )
 

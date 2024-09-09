@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"io"
+
 	"github.com/axone-protocol/axone-sdk/auth"
 	"github.com/axone-protocol/axone-sdk/credential"
 	"github.com/axone-protocol/axone-sdk/credential/template"
 	"github.com/axone-protocol/axone-sdk/dataverse"
 	"github.com/axone-protocol/axone-sdk/keys"
 	"github.com/piprate/json-gold/ld"
-	"io"
 )
 
 const (

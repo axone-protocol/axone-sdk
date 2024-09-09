@@ -51,7 +51,7 @@ func (c *client) AskGovPermittedActions(ctx context.Context, addr, did string) (
 
 	result := response.Answer.Results[0].Substitutions[0].Expression
 	result = result[1 : len(result)-1]
-	var actions []string
+	actions := make([]string, 0)
 	for _, action := range strings.Split(result, ",") {
 		actions = append(actions, strings.Trim(action, "'"))
 	}

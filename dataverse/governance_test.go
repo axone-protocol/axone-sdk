@@ -3,10 +3,10 @@ package dataverse_test
 import (
 	"context"
 	"fmt"
-	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
 	"testing"
 
 	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
+	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
 	"github.com/axone-protocol/axone-sdk/dataverse"
 	"github.com/axone-protocol/axone-sdk/testutil"
 	. "github.com/smartystreets/goconvey/convey"

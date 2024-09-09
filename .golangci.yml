@@ -93,6 +93,7 @@ issues:
       linters:
         - dupl
         - funlen
+        - goconst
     - path: "_test\\.go"
       linters:
         - revive
