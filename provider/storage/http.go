@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/axone-protocol/axone-sdk/auth"
@@ -26,14 +27,16 @@ func (p *Proxy) HTTPReadHandler() auth.AuthenticatedHandler {
 	return func(id *auth.Identity, writer http.ResponseWriter, request *http.Request) {
 		resource, err := p.Read(context.Background(), id, mux.Vars(request)["path"])
 		if err != nil {
-			// ...
+			writer.WriteHeader(http.StatusUnauthorized)
+			_, _ = io.Copy(writer, strings.NewReader(err.Error()))
 			return
 		}
 
-		writer.WriteHeader(http.StatusOK)
 		if _, err := io.Copy(writer, resource); err != nil {
+			writer.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		writer.WriteHeader(http.StatusOK)
 	}
 }
 
@@ -41,13 +44,15 @@ func (p *Proxy) HTTPStoreHandler() auth.AuthenticatedHandler {
 	return func(id *auth.Identity, writer http.ResponseWriter, request *http.Request) {
 		vc, err := p.Store(context.Background(), id, mux.Vars(request)["path"], request.Body)
 		if err != nil {
-			// ...
+			writer.WriteHeader(http.StatusUnauthorized)
+			_, _ = io.Copy(writer, strings.NewReader(err.Error()))
 			return
 		}
 
-		writer.WriteHeader(http.StatusOK)
 		if _, err := io.Copy(writer, vc); err != nil {
+			writer.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		writer.WriteHeader(http.StatusOK)
 	}
 }

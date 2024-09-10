@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"io"
 
 	"github.com/axone-protocol/axone-sdk/auth"
 	"github.com/axone-protocol/axone-sdk/credential"
+	"github.com/axone-protocol/axone-sdk/credential/template"
 	"github.com/axone-protocol/axone-sdk/dataverse"
 	"github.com/axone-protocol/axone-sdk/keys"
+	"github.com/piprate/json-gold/ld"
 )
 
 const (
@@ -20,8 +21,10 @@ const (
 
 type Proxy struct {
 	key       *keys.Key
+	baseURL   string
 	dvClient  dataverse.Client
 	authProxy auth.Proxy
+	vcParser  *credential.DefaultParser
 
 	// given a resource id return its stream
 	readFn func(context.Context, string) (io.Reader, error)
@@ -32,9 +35,9 @@ type Proxy struct {
 func NewProxy(
 	ctx context.Context,
 	key *keys.Key,
-	serviceID string,
+	baseURL string,
 	dvClient dataverse.Client,
-	authParser credential.Parser[*credential.AuthClaim],
+	documentLoader ld.DocumentLoader,
 	readFn func(context.Context, string) (io.Reader, error),
 	storeFn func(context.Context, string, io.Reader) error,
 ) (*Proxy, error) {
@@ -43,10 +46,16 @@ func NewProxy(
 		return nil, err
 	}
 
+	if baseURL[len(baseURL)-1] != '/' {
+		baseURL += "/"
+	}
+
 	return &Proxy{
 		key:       key,
+		baseURL:   baseURL,
 		dvClient:  dvClient,
-		authProxy: auth.NewProxy(gov, serviceID, dvClient, authParser),
+		authProxy: auth.NewProxy(gov, key.DID, dvClient, credential.NewAuthParser(documentLoader)),
+		vcParser:  credential.NewDefaultParser(documentLoader),
 		readFn:    readFn,
 		storeFn:   storeFn,
 	}, nil
@@ -57,29 +66,28 @@ func (p *Proxy) Authenticate(ctx context.Context, credential []byte) (*auth.Iden
 }
 
 func (p *Proxy) Read(ctx context.Context, id *auth.Identity, resourceID string) (io.Reader, error) {
-	// check authenticated identity resolved authorized actions
 	if !id.Can(readAction) {
 		return nil, errors.New("unauthorized")
 	}
 
-	// get resource gov addr
 	govAddr, err := p.dvClient.GetResourceGovAddr(ctx, resourceID)
 	if err != nil {
 		return nil, err
 	}
 
-	// exec resource gov
-	_, err = p.dvClient.ExecGov(ctx, govAddr, fmt.Sprintf("can('%s','%s').", readAction, p.key.DID))
+	ok, err := p.dvClient.AskGovTellAction(ctx, govAddr, p.key.DID, readAction)
 	if err != nil {
 		return nil, err
 	}
 
-	// fetch resource data
+	if !ok {
+		return nil, errors.New("unauthorized")
+	}
+
 	return p.readFn(ctx, resourceID)
 }
 
 func (p *Proxy) Store(ctx context.Context, id *auth.Identity, resourceID string, src io.Reader) (io.Reader, error) {
-	// check authenticated identity resolved authorized actions
 	if !id.Can(storeAction) {
 		return nil, errors.New("unauthorized")
 	}
@@ -88,5 +96,19 @@ func (p *Proxy) Store(ctx context.Context, id *auth.Identity, resourceID string,
 		return nil, err
 	}
 
-	return bytes.NewReader([]byte("publication VC")), nil
+	vc, err := credential.New(
+		template.NewPublication(resourceID, p.baseURL+resourceID, p.key.DID),
+		credential.WithParser(p.vcParser),
+		credential.WithSigner(p.key, p.key.DID),
+	).Generate()
+	if err != nil {
+		return nil, err
+	}
+
+	raw, err := vc.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+
+	return bytes.NewReader(raw), nil
 }

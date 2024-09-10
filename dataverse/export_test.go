@@ -8,10 +8,12 @@ import (
 func NewDataverseClient(
 	dataverseClient dvschema.QueryClient,
 	cognitariumClient cgschema.QueryClient,
+	lawStoneFactory LawStoneFactory,
 ) Client {
 	return &client{
 		dataverseClient,
 		cognitariumClient,
+		lawStoneFactory,
 	}
 }
 

@@ -63,7 +63,7 @@ func TestAuthProxy_Authenticate(t *testing.T) {
 				}
 
 				mockDataverse := testutil.NewMockClient(controller)
-				mockDataverse.EXPECT().ExecGov(gomock.Any(), gomock.Any(), gomock.Any()).Return([]string(nil), nil).MaxTimes(1)
+				mockDataverse.EXPECT().AskGovPermittedActions(gomock.Any(), gomock.Any(), gomock.Any()).Return([]string(nil), nil).MaxTimes(1)
 
 				aProxy := auth.NewProxy(
 					"did:key:zQ3shZxyDoD3QorxHJrFS68EjzDgQZSqZcj3wQqc1ngbF1vgz",
