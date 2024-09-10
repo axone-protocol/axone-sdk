@@ -43,10 +43,15 @@ func (c *client) SendTx(ctx types.Context, msgs []sdk.Msg, opts ...Option) (*sdk
 	txBuilder := c.txConfig.NewTxBuilder()
 	transaction := New(txBuilder, msgs, opts...)
 
-	accNum, accSeq, err := c.getAccountNumberSequence(ctx, transaction.signer.PubKey().Address().String())
+	sender, err := sdk.AccAddressFromHexUnsafe(transaction.signer.PubKey().Address().String())
+	if err != nil {
+		return nil, err
+	}
+
+	accNum, accSeq, err := c.getAccountNumberSequence(ctx, sender.String())
 
 	signerData := authsigning.SignerData{
-		Address:       transaction.signer.PubKey().Address().String(),
+		Address:       sender.String(),
 		ChainID:       ctx.ChainID(),
 		AccountNumber: accNum,
 		Sequence:      accSeq,
@@ -94,7 +99,7 @@ func (c *client) SendTx(ctx types.Context, msgs []sdk.Msg, opts ...Option) (*sdk
 		return nil, err
 	}
 
-	resp, err := c.txClient.BroadcastTx(ctx, &tx.BroadcastTxRequest{TxBytes: encodeTx})
+	resp, err := c.txClient.BroadcastTx(ctx, &tx.BroadcastTxRequest{TxBytes: encodeTx, Mode: tx.BroadcastMode_BROADCAST_MODE_SYNC})
 	if err != nil {
 		return nil, err
 	}

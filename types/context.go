@@ -17,3 +17,9 @@ func (c Context) WithChainID(chainID string) Context {
 	c.chainID = chainID
 	return c
 }
+
+// WithContext returns a new context with the given context.
+func (c Context) WithContext(ctx context.Context) Context {
+	c.Context = ctx
+	return c
+}

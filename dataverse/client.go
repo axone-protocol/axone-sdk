@@ -2,11 +2,17 @@ package dataverse
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/axone-protocol/axone-sdk/keys"
+	"github.com/axone-protocol/axone-sdk/tx"
+	"github.com/axone-protocol/axone-sdk/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	"github.com/piprate/json-gold/ld"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
 	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
 	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
@@ -34,7 +40,7 @@ type Client interface {
 	// The function returns true if Result is 'permitted', false otherwise.
 	AskGovTellAction(context.Context, string, string, string) (bool, error)
 
-	SubmitClaims(ctx context.Context, credential *verifiable.Credential) error
+    SubmitClaims(ctx context.Context, credential *verifiable.Credential, signer keys.Keyring) error
 }
 
 type LawStoneFactory func(string) (lsschema.QueryClient, error)
@@ -42,11 +48,14 @@ type LawStoneFactory func(string) (lsschema.QueryClient, error)
 type client struct {
 	dataverseClient   dvschema.QueryClient
 	cognitariumClient cgschema.QueryClient
+	txClient          tx.Client
+	contractAddr      string
 	lawStoneFactory   LawStoneFactory
 }
 
 func NewClient(ctx context.Context,
 	grpcAddr, contractAddr string,
+	txClient tx.Client,
 	opts ...grpc.DialOption,
 ) (Client, error) {
 	dataverseClient, err := dvschema.NewQueryClient(grpcAddr, contractAddr, opts...)
@@ -67,18 +76,21 @@ func NewClient(ctx context.Context,
 	return &client{
 		dataverseClient,
 		cognitariumClient,
-		func(addr string) (lsschema.QueryClient, error) {
-			return lsschema.NewQueryClient(grpcAddr, addr, opts...)
-		},
+		txClient,
+		contractAddr,
+        func(addr string) (lsschema.QueryClient, error) {
+            return lsschema.NewQueryClient(grpcAddr, addr, opts...)
+        },
 	}, nil
 }
 
-func (c *client) SubmitClaims(_ context.Context, vc *verifiable.Credential) error {
+func (c *client) SubmitClaims(ctx context.Context, vc *verifiable.Credential, signer keys.Keyring) error {
 	proc := ld.NewJsonLdProcessor()
 	options := ld.NewJsonLdOptions("")
 	options.Format = "application/n-quads"
+	options.Explicit = true
 
-	vcRaw, err := json.Marshal(vc)
+	vcRaw, err := vc.MarshalJSON()
 	if err != nil {
 		return err
 	}
@@ -93,6 +105,35 @@ func (c *client) SubmitClaims(_ context.Context, vc *verifiable.Credential) erro
 		return err
 	}
 	fmt.Printf("rdf: %s\n", rdf)
+
+	msg, err := json.Marshal(map[string]interface{}{
+		"submit_claims": map[string]interface{}{
+			"claims": base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s", rdf))),
+		},
+	})
+	if err != nil {
+		return err
+	}
+	addr, err := sdk.AccAddressFromHexUnsafe(signer.PubKey().Address().String())
+	if err != nil {
+		return err
+	}
+	msgExec := &wasmtypes.MsgExecuteContract{
+		Sender:   addr.String(),
+		Contract: c.contractAddr,
+		Msg:      msg,
+		Funds:    nil,
+	}
+
+	sendTx, err := c.txClient.SendTx(types.Context{}.WithContext(ctx).WithChainID("axone-localnet"), []sdk.Msg{msgExec},
+		tx.WithSigner(signer),
+		tx.WithGasLimit(2000000),
+	)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("sendTx: %v\n", sendTx)
 	return nil
 }
 
