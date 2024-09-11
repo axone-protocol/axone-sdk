@@ -1,112 +1,57 @@
 package tx
 
 import (
+	"context"
 	"cosmossdk.io/x/tx/signing"
-	"github.com/axone-protocol/axone-sdk/types"
+	"fmt"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/address"
 	codectype "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx"
-	signingtypes "github.com/cosmos/cosmos-sdk/types/tx/signing"
-	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/gogoproto/proto"
 )
 
 type Client interface {
-	SendTx(ctx types.Context, msgs []sdk.Msg, opts ...Option) (*sdk.TxResponse, error)
+	SendTx(ctx context.Context, transaction Transaction) (*sdk.TxResponse, error)
 }
 
 type client struct {
 	authClient authtypes.QueryClient
-	txConfig   sdkclient.TxConfig
 	txClient   tx.ServiceClient
+	chainID    string
 }
 
-func NewClient(authClient authtypes.QueryClient, txClient tx.ServiceClient) (Client, error) {
-	config, err := makeTxConfig()
-	if err != nil {
-		return nil, err
-	}
-
+func NewClient(authClient authtypes.QueryClient, txClient tx.ServiceClient, chainID string) Client {
 	return &client{
 		authClient,
-		config,
 		txClient,
-	}, nil
+		chainID,
+	}
 }
 
-func (c *client) SendTx(ctx types.Context, msgs []sdk.Msg, opts ...Option) (*sdk.TxResponse, error) {
-	txBuilder := c.txConfig.NewTxBuilder()
-	transaction := New(txBuilder, msgs, opts...)
-
-	sender, err := sdk.AccAddressFromHexUnsafe(transaction.signer.PubKey().Address().String())
+func (c *client) SendTx(ctx context.Context, transaction Transaction) (*sdk.TxResponse, error) {
+	accNum, accSeq, err := c.getAccountNumberSequence(ctx, transaction.Sender())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get account number and sequence: %w", err)
 	}
 
-	accNum, accSeq, err := c.getAccountNumberSequence(ctx, sender.String())
-
-	signerData := authsigning.SignerData{
-		Address:       sender.String(),
-		ChainID:       ctx.ChainID(),
-		AccountNumber: accNum,
-		Sequence:      accSeq,
-		PubKey:        transaction.signer.PubKey(),
-	}
-
-	sig := signingtypes.SignatureV2{
-		PubKey: transaction.signer.PubKey(),
-		Data: &signingtypes.SingleSignatureData{
-			SignMode:  signingtypes.SignMode_SIGN_MODE_DIRECT,
-			Signature: nil,
-		},
-		Sequence: signerData.Sequence,
-	}
-
-	if err := txBuilder.SetSignatures(sig); err != nil {
-		return nil, err
-	}
-
-	bytesToSign, err := authsigning.GetSignBytesAdapter(ctx,
-		c.txConfig.SignModeHandler(),
-		signingtypes.SignMode_SIGN_MODE_DIRECT,
-		signerData,
-		txBuilder.GetTx())
+	txEncoded, err := transaction.GetSignedTx(ctx, accNum, accSeq, c.chainID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed build a signed tx: %w", err)
 	}
 
-	sigBytes, err := transaction.signer.Sign(bytesToSign)
+	resp, err := c.txClient.BroadcastTx(ctx, &tx.BroadcastTxRequest{TxBytes: txEncoded, Mode: tx.BroadcastMode_BROADCAST_MODE_SYNC})
 	if err != nil {
-		return nil, err
-	}
-
-	sig.Data = &signingtypes.SingleSignatureData{
-		SignMode:  signingtypes.SignMode_SIGN_MODE_DIRECT,
-		Signature: sigBytes,
-	}
-
-	if err := txBuilder.SetSignatures(sig); err != nil {
-		return nil, err
-	}
-
-	encodeTx, err := c.txConfig.TxEncoder()(txBuilder.GetTx())
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := c.txClient.BroadcastTx(ctx, &tx.BroadcastTxRequest{TxBytes: encodeTx, Mode: tx.BroadcastMode_BROADCAST_MODE_SYNC})
-	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to broadcast tx: %w", err)
 	}
 	return resp.TxResponse, nil
 }
 
-func (c *client) getAccountNumberSequence(ctx types.Context, addr string) (uint64, uint64, error) {
+func (c *client) getAccountNumberSequence(ctx context.Context, addr string) (uint64, uint64, error) {
 	resp, err := c.authClient.Account(ctx, &authtypes.QueryAccountRequest{Address: addr})
 	if err != nil {
 		return 0, 0, err
@@ -120,7 +65,7 @@ func (c *client) getAccountNumberSequence(ctx types.Context, addr string) (uint6
 	return account.AccountNumber, account.Sequence, nil
 }
 
-func makeTxConfig() (sdkclient.TxConfig, error) {
+func MakeDefaultTxConfig() (sdkclient.TxConfig, error) {
 	interfaceRegistry, err := codectype.NewInterfaceRegistryWithOptions(codectype.InterfaceRegistryOptions{
 		ProtoFiles: proto.HybridResolver,
 		SigningOptions: signing.Options{

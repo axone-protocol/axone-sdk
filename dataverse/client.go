@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/axone-protocol/axone-sdk/keys"
 	"github.com/axone-protocol/axone-sdk/tx"
-	"github.com/axone-protocol/axone-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	"github.com/piprate/json-gold/ld"
@@ -40,7 +39,7 @@ type Client interface {
 	// The function returns true if Result is 'permitted', false otherwise.
 	AskGovTellAction(context.Context, string, string, string) (bool, error)
 
-    SubmitClaims(ctx context.Context, credential *verifiable.Credential, signer keys.Keyring) error
+	SubmitClaims(ctx context.Context, credential *verifiable.Credential, signer keys.Keyring) error
 }
 
 type LawStoneFactory func(string) (lsschema.QueryClient, error)
@@ -78,9 +77,9 @@ func NewClient(ctx context.Context,
 		cognitariumClient,
 		txClient,
 		contractAddr,
-        func(addr string) (lsschema.QueryClient, error) {
-            return lsschema.NewQueryClient(grpcAddr, addr, opts...)
-        },
+		func(addr string) (lsschema.QueryClient, error) {
+			return lsschema.NewQueryClient(grpcAddr, addr, opts...)
+		},
 	}, nil
 }
 
@@ -124,11 +123,15 @@ func (c *client) SubmitClaims(ctx context.Context, vc *verifiable.Credential, si
 		Msg:      msg,
 		Funds:    nil,
 	}
-
-	sendTx, err := c.txClient.SendTx(types.Context{}.WithContext(ctx).WithChainID("axone-localnet"), []sdk.Msg{msgExec},
+	txConfig, err := tx.MakeDefaultTxConfig()
+	if err != nil {
+		return err
+	}
+	sendTx, err := c.txClient.SendTx(ctx, tx.NewTransaction(txConfig,
+		tx.WithMsgs(msgExec),
 		tx.WithSigner(signer),
 		tx.WithGasLimit(2000000),
-	)
+	))
 	if err != nil {
 		return err
 	}
