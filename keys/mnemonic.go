@@ -13,8 +13,8 @@ var _ Keyring = &Key{}
 type Key struct {
 	privKey  types.PrivKey
 	did      string
-	DIDKeyID string
-	Addr     string
+	didKeyID string
+	addr     string
 }
 
 func NewKeyFromMnemonic(mnemonic string) (*Key, error) {
@@ -42,8 +42,8 @@ func NewKeyFromPrivKey(pkey types.PrivKey) (*Key, error) {
 	return &Key{
 		privKey:  pkey,
 		did:      did,
-		DIDKeyID: didKeyID,
-		Addr:     sdk.AccAddress(pkey.PubKey().Address()).String(),
+		didKeyID: didKeyID,
+		addr:     sdk.AccAddress(pkey.PubKey().Address()).String(),
 	}, nil
 }
 
@@ -61,6 +61,14 @@ func (k *Key) Alg() string {
 
 func (k *Key) DID() string {
 	return k.did
+}
+
+func (k *Key) DIDKeyID() string {
+	return k.didKeyID
+}
+
+func (k *Key) Addr() string {
+	return k.addr
 }
 
 func parseMnemonic(mnemonic string) (types.PrivKey, error) {

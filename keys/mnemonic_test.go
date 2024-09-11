@@ -45,8 +45,8 @@ func TestNewKeyFromMnemonic(t *testing.T) {
 							So(key, ShouldNotBeNil)
 							So(key.privKey, ShouldNotBeNil)
 							So(key.DID(), ShouldEqual, test.wantDID)
-							So(key.DIDKeyID, ShouldEqual, test.wantDIDKey)
-							So(key.Addr, ShouldEqual, test.wantAddr)
+							So(key.DIDKeyID(), ShouldEqual, test.wantDIDKey)
+							So(key.Addr(), ShouldEqual, test.wantAddr)
 							So(key.PubKey(), ShouldNotBeNil)
 						}
 					})
