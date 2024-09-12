@@ -28,6 +28,8 @@ func TestClient_SendTx(t *testing.T) {
 
 	tests := []struct {
 		name               string
+		acc                []byte
+		accErr             bool
 		shouldAccountErr   error
 		shouldSignErr      error
 		shouldBroadcastErr error
@@ -35,19 +37,29 @@ func TestClient_SendTx(t *testing.T) {
 	}{
 		{
 			name: "success",
+			acc:  accByte,
 		},
 		{
 			name:             "account error",
+			acc:              accByte,
 			shouldAccountErr: fmt.Errorf("account error"),
 			wantErr:          fmt.Errorf("failed to get account number and sequence: account error"),
 		},
 		{
+			name:    "wrong account marshalling",
+			acc:     []byte("wrong"),
+			accErr:  true,
+			wantErr: fmt.Errorf("failed to get account number and sequence: proto: illegal wireType 7"),
+		},
+		{
 			name:          "signature error",
+			acc:           accByte,
 			shouldSignErr: fmt.Errorf("signature error"),
 			wantErr:       fmt.Errorf("failed build a signed tx: signature error"),
 		},
 		{
 			name:               "broadcast error",
+			acc:                accByte,
 			shouldBroadcastErr: fmt.Errorf("broadcast error"),
 			wantErr:            fmt.Errorf("failed to broadcast tx: broadcast error"),
 		},
@@ -72,14 +84,14 @@ func TestClient_SendTx(t *testing.T) {
 				} else {
 					mockAuthClient.EXPECT().
 						Account(gomock.Any(), &authtypes.QueryAccountRequest{Address: "axone1"}).
-						Return(&authtypes.QueryAccountResponse{Account: &types.Any{Value: accByte}}, nil)
+						Return(&authtypes.QueryAccountResponse{Account: &types.Any{Value: test.acc}}, nil)
 				}
 
 				if test.shouldSignErr != nil {
 					mockTransaction.EXPECT().
 						GetSignedTx(gomock.Any(), uint64(20), uint64(19), "chainID").
 						Return(nil, test.shouldSignErr)
-				} else if test.shouldAccountErr == nil {
+				} else if test.shouldAccountErr == nil && !test.accErr {
 					mockTransaction.EXPECT().
 						GetSignedTx(gomock.Any(), uint64(20), uint64(19), "chainID").
 						Return([]byte("txEncoded"), nil)
@@ -89,7 +101,7 @@ func TestClient_SendTx(t *testing.T) {
 					mockTxService.EXPECT().
 						BroadcastTx(gomock.Any(), &sdktx.BroadcastTxRequest{TxBytes: []byte("txEncoded"), Mode: sdktx.BroadcastMode_BROADCAST_MODE_SYNC}).
 						Return(nil, test.shouldBroadcastErr)
-				} else if test.shouldAccountErr == nil && test.shouldSignErr == nil {
+				} else if test.shouldAccountErr == nil && test.shouldSignErr == nil && !test.accErr {
 					mockTxService.EXPECT().
 						BroadcastTx(gomock.Any(), &sdktx.BroadcastTxRequest{TxBytes: []byte("txEncoded"), Mode: sdktx.BroadcastMode_BROADCAST_MODE_SYNC}).
 						Return(&sdktx.BroadcastTxResponse{TxResponse: &sdktype.TxResponse{}}, nil)
