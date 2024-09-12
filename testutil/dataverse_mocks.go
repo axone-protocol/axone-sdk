@@ -13,6 +13,8 @@ import (
 	context "context"
 	reflect "reflect"
 
+	keys "github.com/axone-protocol/axone-sdk/keys"
+	verifiable "github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -82,4 +84,18 @@ func (m *MockClient) GetResourceGovAddr(arg0 context.Context, arg1 string) (stri
 func (mr *MockClientMockRecorder) GetResourceGovAddr(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResourceGovAddr", reflect.TypeOf((*MockClient)(nil).GetResourceGovAddr), arg0, arg1)
+}
+
+// SubmitClaims mocks base method.
+func (m *MockClient) SubmitClaims(ctx context.Context, credential *verifiable.Credential, signer keys.Keyring) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SubmitClaims", ctx, credential, signer)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SubmitClaims indicates an expected call of SubmitClaims.
+func (mr *MockClientMockRecorder) SubmitClaims(ctx, credential, signer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SubmitClaims", reflect.TypeOf((*MockClient)(nil).SubmitClaims), ctx, credential, signer)
 }

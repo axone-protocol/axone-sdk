@@ -83,7 +83,10 @@ mock: ## Generate all the mocks (for tests)
 	@mockgen -package testutil -destination testutil/cognitarium_client_mocks.go -mock_names QueryClient=MockCognitariumQueryClient github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5 QueryClient
 	@mockgen -package testutil -destination testutil/law_stone_client_mocks.go -mock_names QueryClient=MockLawStoneQueryClient github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5 QueryClient
 	@mockgen -package testutil -destination testutil/signer_mocks.go github.com/hyperledger/aries-framework-go/pkg/doc/verifiable Signer
+	@mockgen -package testutil -destination testutil/auth_client_mocks.go -mock_names QueryClient=MockAuthQueryClient github.com/cosmos/cosmos-sdk/x/auth/types QueryClient
+	@mockgen -package testutil -destination testutil/tx_service_mocks.go -mock_names ServiceClient=MockTxServiceClient github.com/cosmos/cosmos-sdk/types/tx ServiceClient
 	@mockgen -source=credential/generate.go -package testutil -destination testutil/generate_mocks.go
+	@mockgen -source=tx/transaction.go -package testutil -destination testutil/transaction_mocks.go
 
 ## Help:
 .PHONY: help
