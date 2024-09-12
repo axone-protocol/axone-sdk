@@ -64,15 +64,16 @@ func TestGenerator_Generate(t *testing.T) {
 			mockDescriptor.EXPECT().IssuedAt().Times(1)
 			mockDescriptor.EXPECT().ProofPurpose().Return("proof").Times(1)
 
-			mockSigner := testutil.NewMockSigner(controller)
+			mockSigner := testutil.NewMockKeyring(controller)
 			mockSigner.EXPECT().Sign(gomock.Any()).Return([]byte("signature"), nil).Times(1)
 			mockSigner.EXPECT().Alg().AnyTimes()
+			mockSigner.EXPECT().DIDKeyID().Return("did:example:123#123").Times(1)
 
 			loader, _ := testutil.MockDocumentLoader()
 
 			generator := credential.New(mockDescriptor,
 				credential.WithParser(credential.NewDefaultParser(loader)),
-				credential.WithSigner(mockSigner, "did:example:123"),
+				credential.WithSigner(mockSigner),
 			)
 
 			Convey("When generating a credential", func() {
@@ -81,7 +82,7 @@ func TestGenerator_Generate(t *testing.T) {
 					So(err, ShouldBeNil)
 					So(vc, ShouldNotBeNil)
 					So(len(vc.Proofs), ShouldEqual, 1)
-					So(vc.Proofs[0]["verificationMethod"], ShouldEqual, "did:example:123")
+					So(vc.Proofs[0]["verificationMethod"], ShouldEqual, "did:example:123#123")
 					So(vc.Proofs[0]["proofPurpose"], ShouldEqual, "proof")
 				})
 			})

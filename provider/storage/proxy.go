@@ -99,7 +99,7 @@ func (p *Proxy) Store(ctx context.Context, id *auth.Identity, resourceID string,
 	vc, err := credential.New(
 		template.NewPublication(resourceID, p.baseURL+resourceID, p.key.DID()),
 		credential.WithParser(p.vcParser),
-		credential.WithSigner(p.key, p.key.DID()),
+		credential.WithSigner(p.key),
 	).Generate()
 	if err != nil {
 		return nil, err
