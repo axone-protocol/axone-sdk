@@ -2,23 +2,18 @@ package dataverse
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"github.com/axone-protocol/axone-sdk/keys"
-	"github.com/axone-protocol/axone-sdk/tx"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
-	"github.com/piprate/json-gold/ld"
-
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
 	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
 	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
+	"github.com/axone-protocol/axone-sdk/keys"
+	"github.com/axone-protocol/axone-sdk/tx"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	"google.golang.org/grpc"
 )
 
-type Client interface {
+type QueryClient interface {
 	// GetResourceGovAddr returns the governance address of a resource.
 	// It queries the cognitarium to get the governance address (law-stone contract address)
 	// of a resource. The resource is identified by its DID.
@@ -38,25 +33,30 @@ type Client interface {
 	// ```
 	// The function returns true if Result is 'permitted', false otherwise.
 	AskGovTellAction(context.Context, string, string, string) (bool, error)
+}
 
-	SubmitClaims(ctx context.Context, credential *verifiable.Credential, signer keys.Keyring) error
+type TxClient interface {
+	// SubmitClaims submits a verifiable credential to the dataverse contract.
+	// Credential must be signed to be submitted.
+	SubmitClaims(ctx context.Context, credential *verifiable.Credential) error
 }
 
 type LawStoneFactory func(string) (lsschema.QueryClient, error)
 
-type client struct {
+var _ QueryClient = &queryClient{}
+
+type queryClient struct {
 	dataverseClient   dvschema.QueryClient
 	cognitariumClient cgschema.QueryClient
-	txClient          tx.Client
 	contractAddr      string
 	lawStoneFactory   LawStoneFactory
 }
 
-func NewClient(ctx context.Context,
+func NewQueryClient(
+	ctx context.Context,
 	grpcAddr, contractAddr string,
-	txClient tx.Client,
 	opts ...grpc.DialOption,
-) (Client, error) {
+) (QueryClient, error) {
 	dataverseClient, err := dvschema.NewQueryClient(grpcAddr, contractAddr, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create dataverse client: %w", err)
@@ -72,72 +72,14 @@ func NewClient(ctx context.Context,
 		return nil, fmt.Errorf("failed to create cognitarium client: %w", err)
 	}
 
-	return &client{
+	return &queryClient{
 		dataverseClient,
 		cognitariumClient,
-		txClient,
 		contractAddr,
 		func(addr string) (lsschema.QueryClient, error) {
 			return lsschema.NewQueryClient(grpcAddr, addr, opts...)
 		},
 	}, nil
-}
-
-func (c *client) SubmitClaims(ctx context.Context, vc *verifiable.Credential, signer keys.Keyring) error {
-	proc := ld.NewJsonLdProcessor()
-	options := ld.NewJsonLdOptions("")
-	options.Format = "application/n-quads"
-	options.Explicit = true
-
-	vcRaw, err := vc.MarshalJSON()
-	if err != nil {
-		return err
-	}
-
-	var vcJSON interface{}
-	err = json.Unmarshal(vcRaw, &vcJSON)
-	if err != nil {
-		return err
-	}
-	rdf, err := proc.ToRDF(vcJSON, options)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("rdf: %s\n", rdf)
-
-	msg, err := json.Marshal(map[string]interface{}{
-		"submit_claims": map[string]interface{}{
-			"claims": base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s", rdf))),
-		},
-	})
-	if err != nil {
-		return err
-	}
-	addr, err := sdk.AccAddressFromHexUnsafe(signer.PubKey().Address().String())
-	if err != nil {
-		return err
-	}
-	msgExec := &wasmtypes.MsgExecuteContract{
-		Sender:   addr.String(),
-		Contract: c.contractAddr,
-		Msg:      msg,
-		Funds:    nil,
-	}
-	txConfig, err := tx.MakeDefaultTxConfig()
-	if err != nil {
-		return err
-	}
-	sendTx, err := c.txClient.SendTx(ctx, tx.NewTransaction(txConfig,
-		tx.WithMsgs(msgExec),
-		tx.WithSigner(signer),
-		tx.WithGasLimit(2000000),
-	))
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("sendTx: %v\n", sendTx)
-	return nil
 }
 
 func getCognitariumAddr(ctx context.Context, dvClient dvschema.QueryClient) (string, error) {
@@ -148,4 +90,33 @@ func getCognitariumAddr(ctx context.Context, dvClient dvschema.QueryClient) (str
 	}
 
 	return string(resp.TriplestoreAddress), nil
+}
+
+var _ TxClient = &txClient{}
+
+type txClient struct {
+	*queryClient
+
+	txClient tx.Client
+	txConfig client.TxConfig
+	signer   keys.Keyring
+}
+
+func NewTxClient(ctx context.Context,
+	grpcAddr, contractAddr string,
+	client tx.Client,
+	txConfig client.TxConfig,
+	signer keys.Keyring,
+	opts ...grpc.DialOption) (TxClient, error) {
+
+	qClient, err := NewQueryClient(ctx, grpcAddr, contractAddr, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &txClient{
+		queryClient: qClient.(*queryClient),
+		txClient:    client,
+		txConfig:    txConfig,
+		signer:      signer,
+	}, nil
 }

@@ -3,9 +3,6 @@ package dataverse_test
 import (
 	"context"
 	"fmt"
-	"github.com/axone-protocol/axone-sdk/credential"
-	"github.com/axone-protocol/axone-sdk/credential/template"
-	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	"testing"
 
 	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
@@ -33,8 +30,8 @@ func TestClient_NewClient(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			Convey("Given a gRPC addr and contract addr", t, func() {
-				Convey("When Client is created", func() {
-					client, err := dataverse.NewClient(context.Background(), test.grpcAddr, test.contractAddr)
+				Convey("When QueryClient is created", func() {
+					client, err := dataverse.NewQueryClient(context.Background(), test.grpcAddr, test.contractAddr)
 
 					Convey("The client should be created or return an error", func() {
 						So(err.Error(), ShouldContainSubstring, test.wantErr.Error())
@@ -108,62 +105,4 @@ func Test_GetCognitariumAddr(t *testing.T) {
 			})
 		})
 	}
-}
-
-func TestClient_SubmitClaims(t *testing.T) {
-	tests := []struct {
-		name       string
-		credential *verifiable.Credential
-		wantErr    error
-	}{
-		{
-			name:       "valid credential",
-			credential: generateVC(),
-			wantErr:    nil,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			Convey("Given a client", t, func() {
-				controller := gomock.NewController(t)
-				defer controller.Finish()
-
-				mockDataverseClient := testutil.NewMockDataverseQueryClient(controller)
-
-				mockCognitarium := testutil.NewMockCognitariumQueryClient(controller)
-
-				client := dataverse.NewDataverseClient(
-					mockDataverseClient,
-					mockCognitarium,
-				)
-
-				Convey("When SubmitClaims is called", func() {
-					err := client.SubmitClaims(context.Background(), test.credential)
-
-					Convey("Then should return expected error", func() {
-						if test.wantErr == nil {
-							So(err, ShouldBeNil)
-						} else {
-							So(err, ShouldNotBeNil)
-							So(err.Error(), ShouldEqual, test.wantErr.Error())
-						}
-					})
-				})
-			})
-		})
-	}
-}
-
-func generateVC() *verifiable.Credential {
-	loader, _ := testutil.MockDocumentLoader()
-	vc, err := credential.New(
-		template.NewGovernance("datasetID", "addr"),
-		credential.WithParser(credential.NewDefaultParser(loader)),
-	).
-		Generate()
-	if err != nil {
-		panic(err)
-	}
-	return vc
 }

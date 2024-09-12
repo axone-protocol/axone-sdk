@@ -53,7 +53,7 @@ func TestClient_SendTx(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			Convey("Given a client with mocked auth client and service client", t, func() {
+			Convey("Given a client with mocked auth client and tx client", t, func() {
 
 				controller := gomock.NewController(t)
 				defer controller.Finish()

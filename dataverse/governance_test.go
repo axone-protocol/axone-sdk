@@ -133,7 +133,7 @@ func TestClient_GetResourceGovAddr(t *testing.T) {
 					Return(test.response, test.responseError).
 					Times(1)
 
-				client := dataverse.NewDataverseClient(
+				client := dataverse.NewDataverseQueryClient(
 					mockDataverseClient,
 					mockCognitarium,
 					nil,
@@ -294,7 +294,7 @@ func TestClient_AskGovPermittedActions(t *testing.T) {
 						Times(1)
 				}
 
-				client := dataverse.NewDataverseClient(
+				client := dataverse.NewDataverseQueryClient(
 					testutil.NewMockDataverseQueryClient(controller),
 					testutil.NewMockCognitariumQueryClient(controller),
 					func(addr string) (lsschema.QueryClient, error) {
@@ -447,7 +447,7 @@ func TestClient_AskGovTellAction(t *testing.T) {
 						Times(1)
 				}
 
-				client := dataverse.NewDataverseClient(
+				client := dataverse.NewDataverseQueryClient(
 					testutil.NewMockDataverseQueryClient(controller),
 					testutil.NewMockCognitariumQueryClient(controller),
 					func(addr string) (lsschema.QueryClient, error) {

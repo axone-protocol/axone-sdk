@@ -20,15 +20,15 @@ type Client interface {
 }
 
 type client struct {
-	authClient authtypes.QueryClient
-	txClient   tx.ServiceClient
-	chainID    string
+	authClient      authtypes.QueryClient
+	txServiceClient tx.ServiceClient
+	chainID         string
 }
 
-func NewClient(authClient authtypes.QueryClient, txClient tx.ServiceClient, chainID string) Client {
+func NewClient(authClient authtypes.QueryClient, txServiceClient tx.ServiceClient, chainID string) Client {
 	return &client{
 		authClient,
-		txClient,
+		txServiceClient,
 		chainID,
 	}
 }
@@ -44,7 +44,7 @@ func (c *client) SendTx(ctx context.Context, transaction Transaction) (*sdk.TxRe
 		return nil, fmt.Errorf("failed build a signed tx: %w", err)
 	}
 
-	resp, err := c.txClient.BroadcastTx(ctx, &tx.BroadcastTxRequest{TxBytes: txEncoded, Mode: tx.BroadcastMode_BROADCAST_MODE_SYNC})
+	resp, err := c.txServiceClient.BroadcastTx(ctx, &tx.BroadcastTxRequest{TxBytes: txEncoded, Mode: tx.BroadcastMode_BROADCAST_MODE_SYNC})
 	if err != nil {
 		return nil, fmt.Errorf("failed to broadcast tx: %w", err)
 	}

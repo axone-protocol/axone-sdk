@@ -22,7 +22,7 @@ const (
 type Proxy struct {
 	key       keys.Keyring
 	baseURL   string
-	dvClient  dataverse.Client
+	dvClient  dataverse.QueryClient
 	authProxy auth.Proxy
 	vcParser  *credential.DefaultParser
 
@@ -36,7 +36,7 @@ func NewProxy(
 	ctx context.Context,
 	key keys.Keyring,
 	baseURL string,
-	dvClient dataverse.Client,
+	dvClient dataverse.QueryClient,
 	documentLoader ld.DocumentLoader,
 	readFn func(context.Context, string) (io.Reader, error),
 	storeFn func(context.Context, string, io.Reader) error,
