@@ -8,14 +8,15 @@ import (
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/axone-protocol/axone-sdk/tx"
+	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	"github.com/piprate/json-gold/ld"
 )
 
-func (t *txClient) SubmitClaims(ctx context.Context, vc *verifiable.Credential) error {
+func (t *txClient) SubmitClaims(ctx context.Context, vc *verifiable.Credential) (*types.TxResponse, error) {
 	rdf, err := credentialToRDF(vc)
 	if err != nil {
-		return NewDVError(ErrConvertRDF, err)
+		return nil, NewDVError(ErrConvertRDF, err)
 	}
 
 	msg, err := json.Marshal(map[string]interface{}{
@@ -24,7 +25,7 @@ func (t *txClient) SubmitClaims(ctx context.Context, vc *verifiable.Credential) 
 		},
 	})
 	if err != nil {
-		return NewDVError(ErrMarshalJSON, err)
+		return nil, NewDVError(ErrMarshalJSON, err)
 	}
 
 	msgExec := &wasmtypes.MsgExecuteContract{
@@ -34,16 +35,16 @@ func (t *txClient) SubmitClaims(ctx context.Context, vc *verifiable.Credential) 
 		Funds:    nil,
 	}
 
-	_, err = t.txClient.SendTx(ctx, tx.NewTransaction(t.txConfig,
+	resp, err := t.txClient.SendTx(ctx, tx.NewTransaction(t.txConfig,
 		tx.WithMsgs(msgExec),
 		tx.WithSigner(t.signer),
 		tx.WithGasLimit(2000000),
 	))
 	if err != nil {
-		return NewDVError(ErrSendTx, err)
+		return nil, NewDVError(ErrSendTx, err)
 	}
 
-	return nil
+	return resp, nil
 }
 
 func credentialToRDF(vc *verifiable.Credential) (interface{}, error) {

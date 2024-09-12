@@ -10,6 +10,7 @@ import (
 	"github.com/axone-protocol/axone-sdk/keys"
 	"github.com/axone-protocol/axone-sdk/tx"
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	"google.golang.org/grpc"
 )
@@ -39,7 +40,7 @@ type QueryClient interface {
 type TxClient interface {
 	// SubmitClaims submits a verifiable credential to the dataverse contract.
 	// Credential must be signed to be submitted.
-	SubmitClaims(ctx context.Context, credential *verifiable.Credential) error
+	SubmitClaims(ctx context.Context, credential *verifiable.Credential) (*types.TxResponse, error)
 }
 
 type LawStoneFactory func(string) (lsschema.QueryClient, error)

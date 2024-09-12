@@ -56,14 +56,16 @@ func TestClient_SubmitClaims(t *testing.T) {
 				)
 
 				Convey("When SubmitClaims is called", func() {
-					err := client.SubmitClaims(context.Background(), test.credential)
+					r, err := client.SubmitClaims(context.Background(), test.credential)
 
 					Convey("Then should return expected error", func() {
 						if test.wantErr == nil {
 							So(err, ShouldBeNil)
+							So(r, ShouldNotBeNil)
 						} else {
 							So(err, ShouldNotBeNil)
 							So(err.Error(), ShouldEqual, test.wantErr.Error())
+							So(r, ShouldBeNil)
 						}
 					})
 				})
