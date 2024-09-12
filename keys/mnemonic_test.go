@@ -50,6 +50,7 @@ func TestNewKeyFromMnemonic(t *testing.T) {
 							So(key.DIDKeyID(), ShouldEqual, test.wantDIDKey)
 							So(key.Addr(), ShouldEqual, test.wantAddr)
 							So(key.PubKey(), ShouldNotBeNil)
+							So(key.Alg(), ShouldEqual, "secp256k1")
 						}
 					})
 				})
