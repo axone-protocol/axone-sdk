@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/axone-protocol/axone-sdk/tx"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"

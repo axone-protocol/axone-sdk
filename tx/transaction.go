@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/axone-protocol/axone-sdk/keys"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types"
@@ -73,7 +74,8 @@ func WithSigner(signer keys.Keyring) Option {
 
 func (t *transaction) sign(ctx context.Context,
 	accNum, accSeq uint64,
-	chainID string) error {
+	chainID string,
+) error {
 	if t.signer == nil {
 		return errors.New("no signer provided")
 	}
@@ -123,8 +125,8 @@ func (t *transaction) sign(ctx context.Context,
 
 func (t *transaction) GetSignedTx(ctx context.Context,
 	accNum, accSeq uint64,
-	chainID string) ([]byte, error) {
-
+	chainID string,
+) ([]byte, error) {
 	t.txBuilder = t.txConfig.NewTxBuilder()
 
 	if err := t.txBuilder.SetMsgs(t.msgs...); err != nil {

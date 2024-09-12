@@ -14,7 +14,7 @@ import (
 )
 
 func (p *Proxy) HTTPConfigurator(jwtSecretKey []byte, jwtTTL time.Duration) axonehttp.Option {
-	jwtFactory := jwt.NewFactory(jwtSecretKey, p.key.DID, jwtTTL)
+	jwtFactory := jwt.NewFactory(jwtSecretKey, p.key.DID(), jwtTTL)
 
 	return axonehttp.WithOptions(
 		axonehttp.WithRoute(http.MethodGet, "/authenticate", jwtFactory.HTTPAuthHandler(p)),

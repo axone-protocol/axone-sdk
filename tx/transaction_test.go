@@ -1,10 +1,11 @@
 package tx
 
 import (
+	"testing"
+
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/types"
 	. "github.com/smartystreets/goconvey/convey"
-	"testing"
 )
 
 func TestNewTransaction(t *testing.T) {

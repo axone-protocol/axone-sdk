@@ -2,15 +2,17 @@ package dataverse_test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/axone-protocol/axone-sdk/credential"
 	"github.com/axone-protocol/axone-sdk/credential/template"
 	"github.com/axone-protocol/axone-sdk/dataverse"
 	"github.com/axone-protocol/axone-sdk/testutil"
 	"github.com/axone-protocol/axone-sdk/tx"
+	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	. "github.com/smartystreets/goconvey/convey"
 	"go.uber.org/mock/gomock"
-	"testing"
 )
 
 func TestClient_SubmitClaims(t *testing.T) {
@@ -40,6 +42,9 @@ func TestClient_SubmitClaims(t *testing.T) {
 				mockCognitarium := testutil.NewMockCognitariumQueryClient(controller)
 				mockTxClient := testutil.NewMockTxClient(controller)
 				mockKeyring := testutil.NewMockKeyring(controller)
+
+				mockKeyring.EXPECT().Addr().Return("addr").AnyTimes()
+				mockTxClient.EXPECT().SendTx(gomock.Any(), gomock.Any()).Return(&types.TxResponse{}, nil)
 
 				client := dataverse.NewDataverseTxClient(
 					mockDataverseClient,

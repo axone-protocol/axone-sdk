@@ -1,8 +1,11 @@
+//nolint:lll
 package tx_test
 
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	"github.com/axone-protocol/axone-sdk/testutil"
 	"github.com/axone-protocol/axone-sdk/tx"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -11,7 +14,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	. "github.com/smartystreets/goconvey/convey"
 	"go.uber.org/mock/gomock"
-	"testing"
 )
 
 func TestClient_SendTx(t *testing.T) {
@@ -54,7 +56,6 @@ func TestClient_SendTx(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			Convey("Given a client with mocked auth client and tx client", t, func() {
-
 				controller := gomock.NewController(t)
 				defer controller.Finish()
 

@@ -62,7 +62,7 @@ func TestAuthProxy_Authenticate(t *testing.T) {
 					mockAuthParser.EXPECT().ParseSigned(nil).Return(nil, fmt.Errorf("nil")).Times(1)
 				}
 
-				mockDataverse := testutil.NewMockClient(controller)
+				mockDataverse := testutil.NewMockQueryClient(controller)
 				mockDataverse.EXPECT().AskGovPermittedActions(gomock.Any(), gomock.Any(), gomock.Any()).Return([]string(nil), nil).MaxTimes(1)
 
 				aProxy := auth.NewProxy(

@@ -76,7 +76,6 @@ func (p *Proxy) Read(ctx context.Context, id *auth.Identity, resourceID string) 
 	}
 
 	ok, err := p.dvClient.AskGovTellAction(ctx, govAddr, p.key.DID(), readAction)
-
 	if err != nil {
 		return nil, err
 	}

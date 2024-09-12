@@ -1,9 +1,11 @@
+//nolint:lll
 package keys
 
 import (
 	"fmt"
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestNewKeyFromMnemonic(t *testing.T) {

@@ -3,6 +3,7 @@ package dataverse
 import (
 	"context"
 	"fmt"
+
 	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
 	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
 	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
@@ -107,8 +108,8 @@ func NewTxClient(ctx context.Context,
 	client tx.Client,
 	txConfig client.TxConfig,
 	signer keys.Keyring,
-	opts ...grpc.DialOption) (TxClient, error) {
-
+	opts ...grpc.DialOption,
+) (TxClient, error) {
 	qClient, err := NewQueryClient(ctx, grpcAddr, contractAddr, opts...)
 	if err != nil {
 		return nil, err
