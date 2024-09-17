@@ -29,7 +29,7 @@ func NewDefaultParser(documentLoader ld.DocumentLoader) *DefaultParser {
 	return &DefaultParser{documentLoader: documentLoader}
 }
 
-func (cp *DefaultParser) parse(raw []byte) (*verifiable.Credential, error) {
+func (cp *DefaultParser) Parse(raw []byte) (*verifiable.Credential, error) {
 	vc, err := verifiable.ParseCredential(
 		raw,
 		verifiable.WithJSONLDValidation(),
