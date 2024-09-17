@@ -13,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	types "github.com/cosmos/cosmos-sdk/types"
 	verifiable "github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	gomock "go.uber.org/mock/gomock"
 )
@@ -109,11 +110,12 @@ func (m *MockDataverseTxClient) EXPECT() *MockDataverseTxClientMockRecorder {
 }
 
 // SubmitClaims mocks base method.
-func (m *MockDataverseTxClient) SubmitClaims(ctx context.Context, credential *verifiable.Credential) error {
+func (m *MockDataverseTxClient) SubmitClaims(ctx context.Context, credential *verifiable.Credential) (*types.TxResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SubmitClaims", ctx, credential)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*types.TxResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SubmitClaims indicates an expected call of SubmitClaims.

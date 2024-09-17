@@ -66,7 +66,7 @@ func (generator *Generator) Generate() (*verifiable.Credential, error) {
 	if generator.parser == nil {
 		return nil, NewVCError(ErrNoParser, nil)
 	}
-	cred, err := generator.parser.parse(raw.Bytes())
+	cred, err := generator.parser.Parse(raw.Bytes())
 	if err != nil {
 		return nil, NewVCError(ErrParse, err)
 	}
