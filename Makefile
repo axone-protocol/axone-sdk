@@ -77,13 +77,17 @@ mock: ## Generate all the mocks (for tests)
 	@echo "${COLOR_CYAN} 🧱 Generating all the mocks${COLOR_RESET}"
 	@go install go.uber.org/mock/mockgen@v0.4.0
 	@mockgen -source=auth/proxy.go -package testutil -destination testutil/auth_mocks.go
-	@mockgen -source=dataverse/client.go -package testutil -destination testutil/dataverse_mocks.go
+	@mockgen -source=dataverse/client.go -mock_names TxClient=MockDataverseTxClient  -package testutil -destination testutil/dataverse_mocks.go
 	@mockgen -source=credential/parser.go -package testutil -destination testutil/credential_mocks.go
 	@mockgen -package testutil -destination testutil/dataverse_client_mocks.go -mock_names QueryClient=MockDataverseQueryClient github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 QueryClient
 	@mockgen -package testutil -destination testutil/cognitarium_client_mocks.go -mock_names QueryClient=MockCognitariumQueryClient github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5 QueryClient
 	@mockgen -package testutil -destination testutil/law_stone_client_mocks.go -mock_names QueryClient=MockLawStoneQueryClient github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5 QueryClient
-	@mockgen -package testutil -destination testutil/signer_mocks.go github.com/hyperledger/aries-framework-go/pkg/doc/verifiable Signer
+	@mockgen -package testutil -destination testutil/auth_client_mocks.go -mock_names QueryClient=MockAuthQueryClient github.com/cosmos/cosmos-sdk/x/auth/types QueryClient
+	@mockgen -package testutil -destination testutil/tx_service_mocks.go -mock_names ServiceClient=MockTxServiceClient github.com/cosmos/cosmos-sdk/types/tx ServiceClient
 	@mockgen -source=credential/generate.go -package testutil -destination testutil/generate_mocks.go
+	@mockgen -source=tx/transaction.go -package testutil -destination testutil/transaction_mocks.go
+	@mockgen -source=tx/client.go -mock_names Client=MockTxClient -package testutil -destination testutil/tx_mocks.go
+	@mockgen -source=keys/keyring.go -package testutil -destination testutil/keyring_mocks.go
 
 ## Help:
 .PHONY: help

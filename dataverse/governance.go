@@ -9,7 +9,7 @@ import (
 	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
 )
 
-func (c *client) GetResourceGovAddr(ctx context.Context, resourceDID string) (string, error) {
+func (c *queryClient) GetResourceGovAddr(ctx context.Context, resourceDID string) (string, error) {
 	query := buildGetResourceGovAddrRequest(resourceDID)
 	response, err := c.cognitariumClient.Select(ctx, &cgschema.QueryMsg_Select{Query: query})
 	if err != nil {
@@ -31,7 +31,7 @@ func (c *client) GetResourceGovAddr(ctx context.Context, resourceDID string) (st
 	return string(*code.Value.Full), nil
 }
 
-func (c *client) AskGovPermittedActions(ctx context.Context, addr, did string) ([]string, error) {
+func (c *queryClient) AskGovPermittedActions(ctx context.Context, addr, did string) ([]string, error) {
 	gov, err := c.lawStoneFactory(addr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create law-stone client: %w", err)
@@ -59,7 +59,7 @@ func (c *client) AskGovPermittedActions(ctx context.Context, addr, did string) (
 	return actions, nil
 }
 
-func (c *client) AskGovTellAction(ctx context.Context, addr, did, action string) (bool, error) {
+func (c *queryClient) AskGovTellAction(ctx context.Context, addr, did, action string) (bool, error) {
 	gov, err := c.lawStoneFactory(addr)
 	if err != nil {
 		return false, fmt.Errorf("failed to create law-stone client: %w", err)

@@ -21,14 +21,14 @@ type Proxy interface {
 }
 
 type authProxy struct {
-	dvClient   dataverse.Client
+	dvClient   dataverse.QueryClient
 	authParser credential.Parser[*credential.AuthClaim]
 	govAddr    string
 	serviceID  string
 }
 
 func NewProxy(govAddr, serviceID string,
-	dvClient dataverse.Client,
+	dvClient dataverse.QueryClient,
 	authParser credential.Parser[*credential.AuthClaim],
 ) Proxy {
 	return &authProxy{

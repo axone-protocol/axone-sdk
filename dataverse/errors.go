@@ -8,6 +8,10 @@ const (
 	ErrNoResult    MessageError = "no result found in binding"
 	ErrVarNotFound MessageError = "variable not found in binding result"
 	ErrType        MessageError = "variable result type mismatch in binding result"
+
+	ErrConvertRDF  MessageError = "could not convert credential to RDF"
+	ErrMarshalJSON MessageError = "could not marshal JSON message"
+	ErrSendTx      MessageError = "could not send transaction"
 )
 
 type DVError struct {

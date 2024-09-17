@@ -30,8 +30,8 @@ func TestClient_NewClient(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			Convey("Given a gRPC addr and contract addr", t, func() {
-				Convey("When Client is created", func() {
-					client, err := dataverse.NewClient(context.Background(), test.grpcAddr, test.contractAddr)
+				Convey("When QueryClient is created", func() {
+					client, err := dataverse.NewQueryClient(context.Background(), test.grpcAddr, test.contractAddr)
 
 					Convey("The client should be created or return an error", func() {
 						So(err.Error(), ShouldContainSubstring, test.wantErr.Error())

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"time"
 
+	"github.com/axone-protocol/axone-sdk/keys"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/jsonld"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite/ecdsasecp256k1signature2019"
@@ -28,7 +29,7 @@ type Generator struct {
 //					WithID[*GovernanceDescriptor]("id")
 //	     ),
 //		    WithParser(parser),
-//		    WithSignature(signer, "did:key:...")). // Signature is optional and Generate a not signed VC if not provided.
+//		    WithSigner(signer)). // Signature is optional and Generate a not signed VC if not provided.
 //		Generate()
 func New(descriptor Descriptor, opts ...Option) *Generator {
 	g := &Generator{
@@ -49,10 +50,10 @@ func WithParser(parser *DefaultParser) Option {
 	}
 }
 
-func WithSigner(signer verifiable.Signer, did string) Option {
+func WithSigner(signer keys.Keyring) Option {
 	return func(g *Generator) {
 		g.signer = signer
-		g.signerDID = did
+		g.signerDID = signer.DIDKeyID()
 	}
 }
 

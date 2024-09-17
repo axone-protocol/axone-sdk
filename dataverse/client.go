@@ -7,10 +7,15 @@ import (
 	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
 	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
 	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
+	"github.com/axone-protocol/axone-sdk/keys"
+	"github.com/axone-protocol/axone-sdk/tx"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/types"
+	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	"google.golang.org/grpc"
 )
 
-type Client interface {
+type QueryClient interface {
 	// GetResourceGovAddr returns the governance address of a resource.
 	// It queries the cognitarium to get the governance address (law-stone contract address)
 	// of a resource. The resource is identified by its DID.
@@ -32,18 +37,28 @@ type Client interface {
 	AskGovTellAction(context.Context, string, string, string) (bool, error)
 }
 
+type TxClient interface {
+	// SubmitClaims submits a verifiable credential to the dataverse contract.
+	// Credential must be signed to be submitted.
+	SubmitClaims(ctx context.Context, credential *verifiable.Credential) (*types.TxResponse, error)
+}
+
 type LawStoneFactory func(string) (lsschema.QueryClient, error)
 
-type client struct {
+var _ QueryClient = &queryClient{}
+
+type queryClient struct {
 	dataverseClient   dvschema.QueryClient
 	cognitariumClient cgschema.QueryClient
+	contractAddr      string
 	lawStoneFactory   LawStoneFactory
 }
 
-func NewClient(ctx context.Context,
+func NewQueryClient(
+	ctx context.Context,
 	grpcAddr, contractAddr string,
 	opts ...grpc.DialOption,
-) (Client, error) {
+) (QueryClient, error) {
 	dataverseClient, err := dvschema.NewQueryClient(grpcAddr, contractAddr, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create dataverse client: %w", err)
@@ -59,9 +74,10 @@ func NewClient(ctx context.Context,
 		return nil, fmt.Errorf("failed to create cognitarium client: %w", err)
 	}
 
-	return &client{
+	return &queryClient{
 		dataverseClient,
 		cognitariumClient,
+		contractAddr,
 		func(addr string) (lsschema.QueryClient, error) {
 			return lsschema.NewQueryClient(grpcAddr, addr, opts...)
 		},
@@ -76,4 +92,33 @@ func getCognitariumAddr(ctx context.Context, dvClient dvschema.QueryClient) (str
 	}
 
 	return string(resp.TriplestoreAddress), nil
+}
+
+var _ TxClient = &txClient{}
+
+type txClient struct {
+	*queryClient
+
+	txClient tx.Client
+	txConfig client.TxConfig
+	signer   keys.Keyring
+}
+
+func NewTxClient(ctx context.Context,
+	grpcAddr, contractAddr string,
+	client tx.Client,
+	txConfig client.TxConfig,
+	signer keys.Keyring,
+	opts ...grpc.DialOption,
+) (TxClient, error) {
+	qClient, err := NewQueryClient(ctx, grpcAddr, contractAddr, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &txClient{
+		queryClient: qClient.(*queryClient),
+		txClient:    client,
+		txConfig:    txConfig,
+		signer:      signer,
+	}, nil
 }
