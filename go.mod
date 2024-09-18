@@ -7,7 +7,6 @@ require (
 	github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 v5.0.0-20240826124342-6e6abdf73c9a
 	github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5 v5.0.0-20240829161824-0ad316c6fda9
 	github.com/axone-protocol/axoned/v10 v10.0.0
-	github.com/btcsuite/btcd v0.22.0-beta
 	github.com/cosmos/cosmos-sdk v0.50.9
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
@@ -17,6 +16,11 @@ require (
 	github.com/piprate/json-gold v0.5.1-0.20230111113000-6ddbe6e6f19f
 	github.com/smartystreets/goconvey v1.8.1
 	go.uber.org/mock v0.4.0
+)
+
+require (
+	github.com/btcsuite/btcd/btcutil v1.1.5 // indirect
+	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0 // indirect
 )
 
 // Use cutom fork of prolog interpreter, only needed to build
