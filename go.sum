@@ -95,8 +95,8 @@ github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 v5.0.0-20
 github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5 v5.0.0-20240826124342-6e6abdf73c9a/go.mod h1:ztbeFSQhlyxmoBMdCDXT3k9I8VswfCeq3F8TVrxpPVg=
 github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5 v5.0.0-20240829161824-0ad316c6fda9 h1:i5TEHxnkprtp3uOz4nXokxWzGxjLEKYJmRfKsQ6HYzY=
 github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5 v5.0.0-20240829161824-0ad316c6fda9/go.mod h1:en5YIi2VcOYS8vkUGB6HzAUfTk3miolwnzm+Qs9FtfM=
-github.com/axone-protocol/axoned/v9 v9.0.0 h1:tED2oKxf9KF4S8hbpDuUJL/91pEoYrV1femALJovRmY=
-github.com/axone-protocol/axoned/v9 v9.0.0/go.mod h1:9RDsnrYBqXPQPOMFTWiTFULImclBrvUL1U89PUAimHA=
+github.com/axone-protocol/axoned/v10 v10.0.0 h1:ck3IiVkldhuXTyIK17Q83P9tgbhYkood7qUF9/+yWLg=
+github.com/axone-protocol/axoned/v10 v10.0.0/go.mod h1:RFL9hutVTROqqiQxp/4Z7OrghQ7JvZ9ykissftQGLKM=
 github.com/axone-protocol/prolog v1.0.0 h1:CASA1QrPOWhYox8YUStML33rekoA/7Gnp/ldDPZqCTA=
 github.com/axone-protocol/prolog v1.0.0/go.mod h1:lbZPekEi6qr5WX29GgEmhZlTxUkeWeiJ8cZZRq8qjAE=
 github.com/bahlo/generic-list-go v0.2.0 h1:5sz/EEAK+ls5wF+NeqDpk5+iNdMDXrh3z3nPnH1Wvgk=

@@ -1,7 +1,7 @@
 package keys
 
 import (
-	"github.com/axone-protocol/axoned/v9/x/logic/util"
+	"github.com/axone-protocol/axoned/v10/x/logic/util"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	k "github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/crypto/types"
