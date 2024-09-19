@@ -72,7 +72,7 @@ func (d *DatasetDescriptor) IssuedAt() *time.Time {
 }
 
 func (d *DatasetDescriptor) ProofPurpose() string {
-	return "assertionMethod"
+	return credential.ProofPurposeAssertionMethod
 }
 
 func (d *DatasetDescriptor) Generate() (*bytes.Buffer, error) {

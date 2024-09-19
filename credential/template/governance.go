@@ -55,7 +55,7 @@ func (g *GovernanceDescriptor) IssuedAt() *time.Time {
 }
 
 func (g *GovernanceDescriptor) ProofPurpose() string {
-	return "assertionMethod"
+	return credential.ProofPurposeAssertionMethod
 }
 
 func (g *GovernanceDescriptor) Generate() (*bytes.Buffer, error) {

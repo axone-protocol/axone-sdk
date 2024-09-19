@@ -11,6 +11,8 @@ import (
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 )
 
+const ProofPurposeAssertionMethod = "assertionMethod"
+
 // Generator is a verifiable credential generator.
 type Generator struct {
 	vc        Descriptor
