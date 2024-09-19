@@ -75,7 +75,7 @@ func (p *Proxy) Read(ctx context.Context, id *auth.Identity, resourceID string) 
 		return nil, err
 	}
 
-	ok, err := p.dvClient.AskGovTellAction(ctx, govAddr, p.key.DID(), readAction)
+	ok, err := p.dvClient.AskGovTellAction(ctx, govAddr, id.DID, readAction)
 	if err != nil {
 		return nil, err
 	}
