@@ -51,6 +51,30 @@ func TestClient_GetResourceGovAddr(t *testing.T) {
 			wantResult:    "foo",
 		},
 		{
+			name:        "ask for good did response with addr in uri",
+			resourceDID: "did:key:zQ3shuwMJWYXRi64qiGojsV9bPN6Dtugz5YFM2ESPtkaNxTZ5",
+			response: &cgschema.SelectResponse{
+				Head: cgschema.Head{
+					Vars: []string{"code"},
+				},
+				Results: cgschema.Results{
+					Bindings: []map[string]cgschema.Value{
+						{
+							"code": cgschema.Value{
+								ValueType: cgschema.URI{
+									Type:  "uri",
+									Value: cgschema.IRI{Full: toAddress(cgschema.IRI_Full("contract:law-stone:foo"))},
+								},
+							},
+						},
+					},
+				},
+			},
+			responseError: nil,
+			wantErr:       nil,
+			wantResult:    "foo",
+		},
+		{
 			name:          "grpc error",
 			resourceDID:   "did:key:zQ3shuwMJWYXRi64qiGojsV9bPN6Dtugz5YFM2ESPtkaNxTZ5",
 			response:      nil,

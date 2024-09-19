@@ -28,7 +28,14 @@ func (c *queryClient) GetResourceGovAddr(ctx context.Context, resourceDID string
 	if !ok {
 		return "", NewDVError(ErrType, fmt.Errorf("expected URI, got %T", codeBinding.ValueType))
 	}
-	return string(*code.Value.Full), nil
+
+	codeURI := string(*code.Value.Full)
+	addr := codeURI
+	if i := strings.LastIndex(string(*code.Value.Full), ":"); i != -1 {
+		addr = codeURI[i+1:]
+	}
+
+	return addr, nil
 }
 
 func (c *queryClient) AskGovPermittedActions(ctx context.Context, addr, did string) ([]string, error) {
