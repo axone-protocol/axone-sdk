@@ -56,7 +56,7 @@ func (d *PublicationDescriptor) IssuedAt() *time.Time {
 }
 
 func (d *PublicationDescriptor) ProofPurpose() string {
-	return "assertionMethod"
+	return credential.ProofPurposeAssertionMethod
 }
 
 func (d *PublicationDescriptor) Generate() (*bytes.Buffer, error) {
