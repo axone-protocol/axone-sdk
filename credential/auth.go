@@ -8,8 +8,7 @@ import (
 )
 
 const (
-	ClaimToService             = "toService"
-	ProofPurposeAuthentication = "authentication"
+	ClaimToService = "toService"
 )
 
 const ErrAuthClaim MessageError = "invalid auth claim"
