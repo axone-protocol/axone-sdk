@@ -13,22 +13,31 @@ import (
 	"github.com/piprate/json-gold/ld"
 )
 
+// Claim denotes a claim carried by a [verifiable.Credential].
 type Claim interface {
+	// From extracts the Claim from a [verifiable.Credential].
 	From(vc *verifiable.Credential) error
 }
 
+// Parser is a [verifiable.Credential] parser for a certain type of Claim.
 type Parser[T Claim] interface {
+	// ParseSigned parse and verify the authenticity and integrity of a [verifiable.Credential] before returning its Claim.
 	ParseSigned(raw []byte) (T, error)
 }
 
+// DefaultParser is a simple [verifiable.Credential] parser.
 type DefaultParser struct {
 	documentLoader ld.DocumentLoader
 }
 
+// NewDefaultParser creates a new DefaultParser using the provided [ld.DocumentLoader].
 func NewDefaultParser(documentLoader ld.DocumentLoader) *DefaultParser {
 	return &DefaultParser{documentLoader: documentLoader}
 }
 
+// Parse parses a [verifiable.Credential] from a raw byte slice.
+//
+// It does not verify its proof, if you can to check the credential authenticity and integrity use ParseSigned instead.
 func (cp *DefaultParser) Parse(raw []byte) (*verifiable.Credential, error) {
 	vc, err := verifiable.ParseCredential(
 		raw,
@@ -42,7 +51,8 @@ func (cp *DefaultParser) Parse(raw []byte) (*verifiable.Credential, error) {
 	return vc, nil
 }
 
-func (cp *DefaultParser) parseSigned(raw []byte) (*verifiable.Credential, error) {
+// ParseSigned parse and verify the authenticity and integrity of a [verifiable.Credential].
+func (cp *DefaultParser) ParseSigned(raw []byte) (*verifiable.Credential, error) {
 	vc, err := verifiable.ParseCredential(
 		raw,
 		verifiable.WithJSONLDValidation(),
