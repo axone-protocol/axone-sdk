@@ -17,8 +17,8 @@ type Issuer struct {
 	ttl       time.Duration
 }
 
-// NewFactory creates a new Issuer with the given secret key, issuer and token time-to-live.
-func NewFactory(secretKey []byte, issuer string, ttl time.Duration) *Issuer {
+// NewIssuer creates a new Issuer with the given secret key, issuer and token time-to-live.
+func NewIssuer(secretKey []byte, issuer string, ttl time.Duration) *Issuer {
 	return &Issuer{
 		secretKey: secretKey,
 		issuer:    issuer,
@@ -27,28 +27,28 @@ func NewFactory(secretKey []byte, issuer string, ttl time.Duration) *Issuer {
 }
 
 // IssueJWT forge and sign a new JWT token for the given authenticated auth.Identity.
-func (f *Issuer) IssueJWT(identity *auth.Identity) (string, error) {
+func (issuer *Issuer) IssueJWT(identity *auth.Identity) (string, error) {
 	now := time.Now()
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, ProxyClaims{
 		StandardClaims: jwt.StandardClaims{
 			Audience:  identity.DID,
-			ExpiresAt: now.Add(f.ttl).Unix(),
+			ExpiresAt: now.Add(issuer.ttl).Unix(),
 			Id:        uuid.New().String(),
 			IssuedAt:  now.Unix(),
-			Issuer:    f.issuer,
+			Issuer:    issuer.issuer,
 			NotBefore: now.Unix(),
 			Subject:   identity.DID,
 		},
 		Can: Permissions{
 			Actions: identity.AuthorizedActions,
 		},
-	}).SignedString(f.secretKey)
+	}).SignedString(issuer.secretKey)
 }
 
 // VerifyJWT checks the validity and the signature of the given JWT token and returns the authenticated identity.
-func (f *Issuer) VerifyJWT(raw string) (*auth.Identity, error) {
+func (issuer *Issuer) VerifyJWT(raw string) (*auth.Identity, error) {
 	token, err := jwt.ParseWithClaims(raw, &ProxyClaims{}, func(_ *jwt.Token) (interface{}, error) {
-		return f.secretKey, nil
+		return issuer.secretKey, nil
 	})
 	if err != nil {
 		return nil, err

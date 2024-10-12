@@ -11,7 +11,7 @@ import (
 )
 
 // HTTPAuthHandler returns an HTTP handler that authenticates an auth.Identity and issues a related JWT token.
-func (f *Issuer) HTTPAuthHandler(proxy auth.Proxy) http.Handler {
+func (issuer *Issuer) HTTPAuthHandler(proxy auth.Proxy) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		credential, err := io.ReadAll(request.Body)
 		if err != nil {
@@ -25,7 +25,7 @@ func (f *Issuer) HTTPAuthHandler(proxy auth.Proxy) http.Handler {
 			return
 		}
 
-		token, err := f.IssueJWT(id)
+		token, err := issuer.IssueJWT(id)
 		if err != nil {
 			http.Error(writer, fmt.Errorf("failed to issue JWT: %w", err).Error(), http.StatusInternalServerError)
 			return
@@ -41,9 +41,9 @@ func (f *Issuer) HTTPAuthHandler(proxy auth.Proxy) http.Handler {
 
 // VerifyHTTPMiddleware returns an HTTP middleware that verifies the authenticity of a JWT token before forwarding the
 // request to the next auth.AuthenticatedHandler providing the resolve auth.Identity.
-func (f *Issuer) VerifyHTTPMiddleware(next auth.AuthenticatedHandler) http.Handler {
+func (issuer *Issuer) VerifyHTTPMiddleware(next auth.AuthenticatedHandler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		id, err := f.VerifyHTTPRequest(request)
+		id, err := issuer.VerifyHTTPRequest(request)
 		if err != nil {
 			http.Error(writer, err.Error(), http.StatusUnauthorized)
 			return
@@ -55,11 +55,11 @@ func (f *Issuer) VerifyHTTPMiddleware(next auth.AuthenticatedHandler) http.Handl
 
 // VerifyHTTPRequest checks the authenticity of the JWT token from the given HTTP request and returns the authenticated
 // auth.Identity.
-func (f *Issuer) VerifyHTTPRequest(r *http.Request) (*auth.Identity, error) {
+func (issuer *Issuer) VerifyHTTPRequest(r *http.Request) (*auth.Identity, error) {
 	authHeader := r.Header.Get("Authorization")
 	if len(authHeader) < 7 || authHeader[:6] != "Bearer" {
 		return nil, errors.New("couldn't find bearer token")
 	}
 
-	return f.VerifyJWT(authHeader[7:])
+	return issuer.VerifyJWT(authHeader[7:])
 }

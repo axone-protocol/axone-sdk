@@ -17,16 +17,16 @@ import (
 // To convey the authentication information among requests it uses JWT tokens forged and signed using the provided elements.
 //
 // Here are the routes that it configures:
-// - POST /authenticate: to authenticate an identity and return a JWT token;
-// - GET /{path}: to read a resource given its path;
-// - POST /{path}: to store a resource given its path;
+//   - POST /authenticate: to authenticate an identity and return a JWT token
+//   - GET /{path}: to read a resource given its path
+//   - POST /{path}: to store a resource given its path
 func (p *Proxy) HTTPConfigurator(jwtSecretKey []byte, jwtTTL time.Duration) axonehttp.Option {
-	jwtFactory := jwt.NewFactory(jwtSecretKey, p.key.DID(), jwtTTL)
+	jwtIssuer := jwt.NewIssuer(jwtSecretKey, p.key.DID(), jwtTTL)
 
 	return axonehttp.WithOptions(
-		axonehttp.WithRoute(http.MethodPost, "/authenticate", jwtFactory.HTTPAuthHandler(p)),
-		axonehttp.WithRoute(http.MethodGet, "/{path}", jwtFactory.VerifyHTTPMiddleware(p.HTTPReadHandler())),
-		axonehttp.WithRoute(http.MethodPost, "/{path}", jwtFactory.VerifyHTTPMiddleware(p.HTTPStoreHandler())),
+		axonehttp.WithRoute(http.MethodPost, "/authenticate", jwtIssuer.HTTPAuthHandler(p)),
+		axonehttp.WithRoute(http.MethodGet, "/{path}", jwtIssuer.VerifyHTTPMiddleware(p.HTTPReadHandler())),
+		axonehttp.WithRoute(http.MethodPost, "/{path}", jwtIssuer.VerifyHTTPMiddleware(p.HTTPStoreHandler())),
 	)
 }
 
