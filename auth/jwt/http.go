@@ -10,7 +10,8 @@ import (
 	"github.com/axone-protocol/axone-sdk/auth"
 )
 
-func (f *Factory) HTTPAuthHandler(proxy auth.Proxy) http.Handler {
+// HTTPAuthHandler returns an HTTP handler that authenticates an auth.Identity and issues a related JWT token.
+func (f *Issuer) HTTPAuthHandler(proxy auth.Proxy) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		credential, err := io.ReadAll(request.Body)
 		if err != nil {
@@ -38,7 +39,9 @@ func (f *Factory) HTTPAuthHandler(proxy auth.Proxy) http.Handler {
 	})
 }
 
-func (f *Factory) VerifyHTTPMiddleware(next auth.AuthenticatedHandler) http.Handler {
+// VerifyHTTPMiddleware returns an HTTP middleware that verifies the authenticity of a JWT token before forwarding the
+// request to the next auth.AuthenticatedHandler providing the resolve auth.Identity.
+func (f *Issuer) VerifyHTTPMiddleware(next auth.AuthenticatedHandler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		id, err := f.VerifyHTTPRequest(request)
 		if err != nil {
@@ -50,7 +53,9 @@ func (f *Factory) VerifyHTTPMiddleware(next auth.AuthenticatedHandler) http.Hand
 	})
 }
 
-func (f *Factory) VerifyHTTPRequest(r *http.Request) (*auth.Identity, error) {
+// VerifyHTTPRequest checks the authenticity of the JWT token from the given HTTP request and returns the authenticated
+// auth.Identity.
+func (f *Issuer) VerifyHTTPRequest(r *http.Request) (*auth.Identity, error) {
 	authHeader := r.Header.Get("Authorization")
 	if len(authHeader) < 7 || authHeader[:6] != "Bearer" {
 		return nil, errors.New("couldn't find bearer token")
