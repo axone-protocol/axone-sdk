@@ -1,3 +1,4 @@
+// Package http provides an HTTP server with a configurable server and router.
 package http
 
 import (
@@ -12,11 +13,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Server carries an HTTP server and a router that can be configured through Option when instantiating it.
 type Server struct {
 	server *http.Server
 	router *mux.Router
 }
 
+// NewServer creates a new HTTP Server with the given listening address and configured with the provided Option.
 func NewServer(addr string, opts ...Option) *Server {
 	router := mux.NewRouter()
 	s := &Server{
@@ -33,8 +36,10 @@ func NewServer(addr string, opts ...Option) *Server {
 	return s
 }
 
+// Option is a function to configure a Server.
 type Option func(*Server)
 
+// WithOptions construct an Option that applies multiple Option to a Server.
 func WithOptions(opts ...Option) Option {
 	return func(s *Server) {
 		for _, opt := range opts {
@@ -43,10 +48,25 @@ func WithOptions(opts ...Option) Option {
 	}
 }
 
-func WithRoute(method, path string, handler http.Handler) Option {
+// WithRouterOption construct an Option that configure the Server's router.
+func WithRouterOption(opt func(*mux.Router)) Option {
 	return func(s *Server) {
-		s.router.Methods(method).Path(path).Handler(handler)
+		opt(s.router)
 	}
+}
+
+// WithServerOption construct an Option that configure the Server's http.Server.
+func WithServerOption(opt func(*http.Server)) Option {
+	return func(s *Server) {
+		opt(s.server)
+	}
+}
+
+// WithRoute construct an Option that adds a route to the Server's router.
+func WithRoute(method, path string, handler http.Handler) Option {
+	return WithRouterOption(func(r *mux.Router) {
+		r.Methods(method).Path(path).Handler(handler)
+	})
 }
 
 // Listen runs the server in a blocking way. In returns either if an error occur which in that case returns the error,
