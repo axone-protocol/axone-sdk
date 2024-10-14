@@ -6,6 +6,7 @@ type Identity struct {
 	AuthorizedActions []string
 }
 
+// Can check if the identity is authorized to perform a specific action.
 func (i Identity) Can(action string) bool {
 	for _, a := range i.AuthorizedActions {
 		if a == action {

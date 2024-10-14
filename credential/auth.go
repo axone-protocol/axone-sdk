@@ -15,6 +15,7 @@ const ErrAuthClaim MessageError = "invalid auth claim"
 
 var _ Claim = (*AuthClaim)(nil)
 
+// AuthClaim carries the claims of a [verifiable.Credential] for authentication purpose.
 type AuthClaim struct {
 	ID        string
 	ToService string
@@ -43,10 +44,12 @@ func (ac *AuthClaim) From(vc *verifiable.Credential) error {
 
 var _ Parser[*AuthClaim] = (*AuthParser)(nil)
 
+// AuthParser is a [verifiable.Credential] parser expected to carry [AuthClaim].
 type AuthParser struct {
 	*DefaultParser
 }
 
+// NewAuthParser creates a new AuthParser using the provided [ld.DocumentLoader].
 func NewAuthParser(documentLoader ld.DocumentLoader) *AuthParser {
 	return &AuthParser{
 		DefaultParser: &DefaultParser{documentLoader: documentLoader},
@@ -54,7 +57,7 @@ func NewAuthParser(documentLoader ld.DocumentLoader) *AuthParser {
 }
 
 func (ap *AuthParser) ParseSigned(raw []byte) (*AuthClaim, error) {
-	cred, err := ap.parseSigned(raw)
+	cred, err := ap.DefaultParser.ParseSigned(raw)
 	if err != nil {
 		return nil, err
 	}

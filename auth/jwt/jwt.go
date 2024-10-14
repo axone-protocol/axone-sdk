@@ -1,3 +1,4 @@
+// Package jwt brings a mean to manage JWT tokens on top of Axone network authentication mechanisms.
 package jwt
 
 import (
@@ -9,41 +10,45 @@ import (
 	"github.com/google/uuid"
 )
 
-type Factory struct {
+// Issuer is an entity responsible to issue and verify JWT tokens.
+type Issuer struct {
 	secretKey []byte
 	issuer    string
 	ttl       time.Duration
 }
 
-func NewFactory(secretKey []byte, issuer string, ttl time.Duration) *Factory {
-	return &Factory{
+// NewIssuer creates a new Issuer with the given secret key, issuer and token time-to-live.
+func NewIssuer(secretKey []byte, issuer string, ttl time.Duration) *Issuer {
+	return &Issuer{
 		secretKey: secretKey,
 		issuer:    issuer,
 		ttl:       ttl,
 	}
 }
 
-func (f *Factory) IssueJWT(identity *auth.Identity) (string, error) {
+// IssueJWT forge and sign a new JWT token for the given authenticated auth.Identity.
+func (issuer *Issuer) IssueJWT(identity *auth.Identity) (string, error) {
 	now := time.Now()
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, ProxyClaims{
 		StandardClaims: jwt.StandardClaims{
 			Audience:  identity.DID,
-			ExpiresAt: now.Add(f.ttl).Unix(),
+			ExpiresAt: now.Add(issuer.ttl).Unix(),
 			Id:        uuid.New().String(),
 			IssuedAt:  now.Unix(),
-			Issuer:    f.issuer,
+			Issuer:    issuer.issuer,
 			NotBefore: now.Unix(),
 			Subject:   identity.DID,
 		},
 		Can: Permissions{
 			Actions: identity.AuthorizedActions,
 		},
-	}).SignedString(f.secretKey)
+	}).SignedString(issuer.secretKey)
 }
 
-func (f *Factory) VerifyJWT(raw string) (*auth.Identity, error) {
+// VerifyJWT checks the validity and the signature of the given JWT token and returns the authenticated identity.
+func (issuer *Issuer) VerifyJWT(raw string) (*auth.Identity, error) {
 	token, err := jwt.ParseWithClaims(raw, &ProxyClaims{}, func(_ *jwt.Token) (interface{}, error) {
-		return f.secretKey, nil
+		return issuer.secretKey, nil
 	})
 	if err != nil {
 		return nil, err

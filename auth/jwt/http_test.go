@@ -16,7 +16,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestFactory_HTTPAuthHandler(t *testing.T) {
+func TestIssuer_HTTPAuthHandler(t *testing.T) {
 	tests := []struct {
 		name                 string
 		body                 []byte
@@ -45,14 +45,14 @@ func TestFactory_HTTPAuthHandler(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			Convey("Given a JWT factory and mocked auth proxy on mocked http server", t, func() {
-				factory := jwt.NewFactory(nil, "issuer", 5*time.Second)
+			Convey("Given a JWT issuer and mocked auth proxy on mocked http server", t, func() {
+				issuer := jwt.NewIssuer(nil, "issuer", 5*time.Second)
 
 				controller := gomock.NewController(t)
 				defer controller.Finish()
 
 				mockAuthProxy := testutil.NewMockProxy(controller)
-				handler := factory.HTTPAuthHandler(mockAuthProxy)
+				handler := issuer.HTTPAuthHandler(mockAuthProxy)
 
 				mockAuthProxy.EXPECT().Authenticate(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(_ context.Context, body []byte) (interface{}, error) {
@@ -80,9 +80,9 @@ func TestFactory_HTTPAuthHandler(t *testing.T) {
 	}
 }
 
-func TestFactory_VerifyHTTPMiddleware(t *testing.T) {
+func TestIssuer_VerifyHTTPMiddleware(t *testing.T) {
 	// Generate a valid token for testing purpose
-	token, err := jwt.NewFactory([]byte("secret"), "issuer", 5*time.Second).IssueJWT(&auth.Identity{
+	token, err := jwt.NewIssuer([]byte("secret"), "issuer", 5*time.Second).IssueJWT(&auth.Identity{
 		DID:               "did:key:zQ3shpoUHzwcgdt2gxjqHHnJnNkBVd4uX3ZBhmPiM7J93yqCr",
 		AuthorizedActions: nil,
 	})
@@ -122,8 +122,8 @@ func TestFactory_VerifyHTTPMiddleware(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			Convey("Given a JWT factory and mocked authenticated handler", t, func() {
-				factory := jwt.NewFactory([]byte("secret"), "issuer", 5*time.Second)
+			Convey("Given a JWT issuer and mocked authenticated handler", t, func() {
+				issuer := jwt.NewIssuer([]byte("secret"), "issuer", 5*time.Second)
 
 				mockHandler := func(id *auth.Identity, w http.ResponseWriter, _ *http.Request) {
 					So(id, ShouldResemble, test.expectedIdentity)
@@ -132,7 +132,7 @@ func TestFactory_VerifyHTTPMiddleware(t *testing.T) {
 					So(err, ShouldBeNil)
 				}
 
-				middleware := factory.VerifyHTTPMiddleware(mockHandler)
+				middleware := issuer.VerifyHTTPMiddleware(mockHandler)
 
 				Convey("When the VerifyHTTPMiddleware is called", func() {
 					req, err := http.NewRequest("GET", "/", nil) //nolint:noctx

@@ -1,3 +1,4 @@
+// Package storage provides the core logic needed to implement storage services in the Axone protocol.
 package storage
 
 import (
@@ -19,6 +20,9 @@ const (
 	storeAction = "store"
 )
 
+// Proxy serves as an authentication and authorization proxy of an Axone storage service.
+// It is responsible for authenticating and authorizing identities before operations as read and store resources.
+// The specific logic of reading and storing resources is delegated to the readFn and storeFn functions.
 type Proxy struct {
 	key       keys.Keyring
 	baseURL   string
@@ -32,6 +36,8 @@ type Proxy struct {
 	storeFn func(context.Context, string, io.Reader) error
 }
 
+// NewProxy creates a new Proxy instance, using the provided service DID to retrieve its governance (i.e. law-stone smart
+// contract address) on the dataverse.
 func NewProxy(
 	ctx context.Context,
 	key keys.Keyring,
@@ -61,10 +67,16 @@ func NewProxy(
 	}, nil
 }
 
+// Authenticate performs the authentication of an identity from a verifiable credential returning its resolved auth.Identity.
 func (p *Proxy) Authenticate(ctx context.Context, credential []byte) (*auth.Identity, error) {
 	return p.authProxy.Authenticate(ctx, credential)
 }
 
+// Read reads a resource identified by its resourceID, returning its stream if the identity is authorized to do so.
+//
+// The identity is authorized to read a resource if both the proxied service's governance and the requested resource's
+// governance allows it. To check the proxied service's governance it uses the set of resolved permissions at authentication.
+// To check the requested resource's governance it retrieves it from the dataverse before querying it.
 func (p *Proxy) Read(ctx context.Context, id *auth.Identity, resourceID string) (io.Reader, error) {
 	if !id.Can(readAction) {
 		return nil, errors.New("unauthorized")
@@ -87,6 +99,12 @@ func (p *Proxy) Read(ctx context.Context, id *auth.Identity, resourceID string) 
 	return p.readFn(ctx, resourceID)
 }
 
+// Store stores a resource identified by its resourceID, returning its publication credential. This publication credential
+// is a verifiable credential that attests the publication of the resource by the proxied service, it is expected to be
+// submitted to the dataverse in order to reference the resource.
+//
+// The identity is authorized to read a resource if the proxied service's governance allows it, it uses the set of resolved
+// permissions at authentication to do so.
 func (p *Proxy) Store(ctx context.Context, id *auth.Identity, resourceID string, src io.Reader) (io.Reader, error) {
 	if !id.Can(storeAction) {
 		return nil, errors.New("unauthorized")

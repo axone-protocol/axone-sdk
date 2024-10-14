@@ -27,6 +27,8 @@ type authProxy struct {
 	serviceID  string
 }
 
+// NewProxy creates a new Proxy instance using the given service identifier and on-chain governance address (i.e. the
+// law-stone smart contract instance carrying its rules).
 func NewProxy(govAddr, serviceID string,
 	dvClient dataverse.QueryClient,
 	authParser credential.Parser[*credential.AuthClaim],
@@ -39,6 +41,8 @@ func NewProxy(govAddr, serviceID string,
 	}
 }
 
+// Authenticate verifies the authenticity and integrity of the provided credential before resolving on-chain
+// authorized actions with the proxied service by querying its governance.
 func (a *authProxy) Authenticate(ctx context.Context, credential []byte) (*Identity, error) {
 	authClaim, err := a.authParser.ParseSigned(credential)
 	if err != nil {
