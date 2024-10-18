@@ -16,7 +16,7 @@ require (
 	github.com/hyperledger/aries-framework-go v0.3.2
 	github.com/piprate/json-gold v0.5.1-0.20230111113000-6ddbe6e6f19f
 	github.com/smartystreets/goconvey v1.8.1
-	go.uber.org/mock v0.4.0
+	go.uber.org/mock v0.5.0
 )
 
 require github.com/cockroachdb/fifo v0.0.0-20240606204812-0bbfbd93a7ce // indirect
