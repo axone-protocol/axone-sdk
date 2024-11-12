@@ -5,7 +5,7 @@ TARGET_FOLDER = target
 
 # Docker images
 DOCKER_IMAGE_GOLANG    = golang:1.21-alpine3.17
-DOCKER_IMAGE_GOLANG_CI = golangci/golangci-lint:v1.59
+DOCKER_IMAGE_GOLANG_CI = golangci/golangci-lint:v1.62
 
 # Some colors
 COLOR_GREEN  = $(shell tput -Txterm setaf 2)
