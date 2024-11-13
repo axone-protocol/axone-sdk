@@ -24,6 +24,13 @@ Axone SDK is the official software development kit (SDK) for the Axone Protocol.
 
 The Axone SDK is written in Go and is designed to be modular and extensible. It is built with a focus on security, performance, and ease of use.
 
+## Community
+
+The [**AXONE Discord Server**](https://discord.gg/axone) is our primary chat channel for the open-source community,
+software developers and node operators.
+
+Please reach out to us and say hi 👋, we're happy to help there.
+
 ## You want to get involved? 😍
 
 Please check out Axone health files :
