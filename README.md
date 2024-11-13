@@ -18,6 +18,12 @@
 [![contributor covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg?style=for-the-badge)](https://github.com/axone-protocol/.github/blob/main/CODE_OF_CONDUCT.md)
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg?style=for-the-badge)](https://opensource.org/licenses/BSD-3-Clause)
 
+## What is Axone SDK? 🤔
+
+Axone SDK is the official software development kit (SDK) for the Axone Protocol. It provides a set of tools and libraries to interact with the Axone Protocol and its ecosystem and enables developers to build applications on top of the Axone Protocol.
+
+The Axone SDK is written in Go and is designed to be modular and extensible. It is built with a focus on security, performance, and ease of use.
+
 ## You want to get involved? 😍
 
 Please check out Axone health files :
