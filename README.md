@@ -24,6 +24,23 @@ Axone SDK is the official software development kit (SDK) for the Axone Protocol.
 
 The Axone SDK is written in Go and is designed to be modular and extensible. It is built with a focus on security, performance, and ease of use.
 
+## Features
+
+- [x] **Transaction management**
+  - Creation, signing, and broadcasting of transactions to a Cosmos SDK-based blockchain.
+- [x] **Key management**
+  - Support for keys with DIDs.
+- [x] **Verifiable Credential lifecycle**
+  - Parsing, verification, issuance, and signing of Verifiable Credentials.
+- [x] **Axone protocol interactions**
+  - Retrieval of the governance address of a resource.
+  - Listing of permitted actions for a resource identified by its DID.
+  - Verification of whether a specific action is permitted for a given resource.
+- [x] **Axone storage services**
+  - Provision of core logic for Axone protocol-compliant storage services.
+- [x] **Authentication**
+  - Support for authentication using Verifiable Credentials and JWT.
+
 ## 🐛 Bug Reports & 🌟 Feature Requests
 
 If you notice anything not behaving how you expected, if you would like to make a suggestion or would like
