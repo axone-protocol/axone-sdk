@@ -44,7 +44,6 @@ func (p *Proxy) HTTPReadHandler() auth.AuthenticatedHandler {
 			writer.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		writer.WriteHeader(http.StatusOK)
 	}
 }
 
