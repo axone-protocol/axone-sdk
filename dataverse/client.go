@@ -35,6 +35,9 @@ type QueryClient interface {
 	// ```
 	// The function returns true if Result is 'permitted', false otherwise.
 	AskGovTellAction(context.Context, string, string, string) (bool, error)
+
+	// GovCode retrieves the governance code given its address (law-stone contract address)
+	GovCode(context.Context, string) (string, error)
 }
 
 type TxClient interface {
