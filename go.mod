@@ -19,7 +19,10 @@ require (
 	go.uber.org/mock v0.5.0
 )
 
-require github.com/cockroachdb/fifo v0.0.0-20240606204812-0bbfbd93a7ce // indirect
+require (
+	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0 // indirect
+	github.com/cockroachdb/fifo v0.0.0-20240606204812-0bbfbd93a7ce // indirect
+)
 
 // Use cutom fork of prolog interpreter, only needed to build
 replace github.com/ichiban/prolog => github.com/axone-protocol/prolog v1.0.0
