@@ -86,6 +86,21 @@ func (mr *MockQueryClientMockRecorder) GetResourceGovAddr(arg0, arg1 any) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResourceGovAddr", reflect.TypeOf((*MockQueryClient)(nil).GetResourceGovAddr), arg0, arg1)
 }
 
+// GovCode mocks base method.
+func (m *MockQueryClient) GovCode(arg0 context.Context, arg1 string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GovCode", arg0, arg1)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GovCode indicates an expected call of GovCode.
+func (mr *MockQueryClientMockRecorder) GovCode(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GovCode", reflect.TypeOf((*MockQueryClient)(nil).GovCode), arg0, arg1)
+}
+
 // MockDataverseTxClient is a mock of TxClient interface.
 type MockDataverseTxClient struct {
 	ctrl     *gomock.Controller
