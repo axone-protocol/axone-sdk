@@ -61,7 +61,7 @@ test: test-go ## Pass all the tests
 .PHONY: test-go
 test-go: build ## Pass the test for the go source code
 	@echo "${COLOR_CYAN} 🧪 Passing go tests${COLOR_RESET}"
-	@mkdir $(TARGET_FOLDER)
+	@mkdir -p $(TARGET_FOLDER)
 	@go test -v -coverprofile $(TARGET_FOLDER)/coverage.txt ./...
 
 ## Clean:
