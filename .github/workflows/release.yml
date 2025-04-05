@@ -3,6 +3,10 @@ name: Release
 on:
   workflow_dispatch:
 
+permissions:
+  pull-requests: read
+  contents: read
+
 jobs:
   lint:
     if: github.ref == 'refs/heads/main' && github.actor == 'bot-anik'
