@@ -1,5 +1,17 @@
 # Axone SDK changelog
 
+## [1.1.0](https://github.com/axone-protocol/axone-sdk/compare/v1.0.0...v1.1.0) (2025-04-05)
+
+
+### Features
+
+* **dataverse:** add GovCode to retrieve governance code from law-stone ([09ae724](https://github.com/axone-protocol/axone-sdk/commit/09ae724daf3fb3f854273c308bf757162434baec))
+
+
+### Bug Fixes
+
+* **srv:** avoid unnecessary HTTP 200 status write ([02256d7](https://github.com/axone-protocol/axone-sdk/commit/02256d7b2502a54497ebb94469f5f9e4c8f8c69d))
+
 ## 1.0.0 (2024-11-13)
 
 
