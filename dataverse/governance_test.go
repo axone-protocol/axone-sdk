@@ -499,3 +499,89 @@ func TestClient_AskGovTellAction(t *testing.T) {
 		})
 	}
 }
+
+func TestGovCode(t *testing.T) {
+	tests := []struct {
+		name          string
+		addr          string
+		programCode   *string
+		lawStoneError error
+		wantErr       string
+		wantCode      string
+	}{
+		{
+			name:        "Success",
+			addr:        "foo",
+			programCode: toAddress("cHJvZ3JhbSBjb2Rl"),
+			wantErr:     "",
+			wantCode:    "program code",
+		},
+		{
+			name:     "LawStone client error",
+			addr:     "error",
+			wantErr:  "failed to create law-stone client: error",
+			wantCode: "",
+		},
+		{
+			name:          "Query error",
+			addr:          "foo",
+			lawStoneError: fmt.Errorf("query error"),
+			wantErr:       "failed to query law-stone contract: query error",
+			wantCode:      "",
+		},
+		{
+			name:     "No program code",
+			addr:     "foo",
+			wantErr:  "",
+			wantCode: "",
+		},
+		{
+			name:        "Incorrect base64 code",
+			addr:        "foo",
+			programCode: toAddress("incorrect base64 code"),
+			wantErr:     "failed to decode law-stone code: illegal base64 data at input byte 9",
+			wantCode:    "",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			Convey("Given a mocked dataverse client", t, func() {
+				controller := gomock.NewController(t)
+				defer controller.Finish()
+
+				lawStoneMock := testutil.NewMockLawStoneQueryClient(controller)
+				if test.addr != "error" {
+					lawStoneMock.EXPECT().
+						ProgramCode(gomock.Any(), gomock.Any()).
+						Return(test.programCode, test.lawStoneError).
+						Times(1)
+				}
+
+				client := dataverse.NewDataverseQueryClient(
+					testutil.NewMockDataverseQueryClient(controller),
+					testutil.NewMockCognitariumQueryClient(controller),
+					func(addr string) (lsschema.QueryClient, error) {
+						if addr == "error" {
+							return nil, fmt.Errorf("error")
+						}
+						return lawStoneMock, nil
+					},
+				)
+
+				Convey("When GovCode is called", func() {
+					code, err := client.GovCode(context.Background(), test.addr)
+
+					Convey("Then the expected result should be returned", func() {
+						if test.wantErr == "" {
+							So(err, ShouldBeNil)
+						} else {
+							So(err.Error(), ShouldEqual, test.wantErr)
+						}
+						So(code, ShouldEqual, test.wantCode)
+					})
+				})
+			})
+		})
+	}
+}

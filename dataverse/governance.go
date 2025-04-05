@@ -2,6 +2,7 @@ package dataverse
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"strings"
 
@@ -36,6 +37,28 @@ func (c *queryClient) GetResourceGovAddr(ctx context.Context, resourceDID string
 	}
 
 	return addr, nil
+}
+
+func (c *queryClient) GovCode(ctx context.Context, addr string) (string, error) {
+	gov, err := c.lawStoneFactory(addr)
+	if err != nil {
+		return "", fmt.Errorf("failed to create law-stone client: %w", err)
+	}
+
+	code, err := gov.ProgramCode(ctx, &lsschema.QueryMsg_ProgramCode{})
+	if err != nil {
+		return "", fmt.Errorf("failed to query law-stone contract: %w", err)
+	}
+	if code == nil {
+		return "", nil
+	}
+
+	decodedCode, err := base64.StdEncoding.DecodeString(*code)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode law-stone code: %w", err)
+	}
+
+	return string(decodedCode), nil
 }
 
 func (c *queryClient) AskGovPermittedActions(ctx context.Context, addr, did string) ([]string, error) {
