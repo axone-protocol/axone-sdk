@@ -11,6 +11,9 @@ jobs:
   lint:
     if: github.ref == 'refs/heads/main' && github.actor == 'bot-anik'
     uses: ./.github/workflows/lint.yml
+    permissions:
+      actions: read
+      security-events: write
 
   build:
     if: github.ref == 'refs/heads/main' && github.actor == 'bot-anik'
