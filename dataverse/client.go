@@ -16,6 +16,9 @@ import (
 )
 
 type QueryClient interface {
+	// DataverseInfo retrieves the dataverse information.
+	DataverseInfo(context.Context) (*Info, error)
+
 	// GetResourceGovAddr returns the governance address of a resource.
 	// It queries the cognitarium to get the governance address (law-stone contract address)
 	// of a resource. The resource is identified by its DID.
