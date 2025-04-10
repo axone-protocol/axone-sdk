@@ -1,4 +1,3 @@
-// Package jwt brings a mean to manage JWT tokens on top of Axone network authentication mechanisms.
 package jwt
 
 import (
