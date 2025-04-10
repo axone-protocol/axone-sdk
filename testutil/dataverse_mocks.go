@@ -13,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	dataverse "github.com/axone-protocol/axone-sdk/dataverse"
 	types "github.com/cosmos/cosmos-sdk/types"
 	verifiable "github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	gomock "go.uber.org/mock/gomock"
@@ -69,6 +70,35 @@ func (m *MockQueryClient) AskGovTellAction(arg0 context.Context, arg1, arg2, arg
 func (mr *MockQueryClientMockRecorder) AskGovTellAction(arg0, arg1, arg2, arg3 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AskGovTellAction", reflect.TypeOf((*MockQueryClient)(nil).AskGovTellAction), arg0, arg1, arg2, arg3)
+}
+
+// DataverseAddr mocks base method.
+func (m *MockQueryClient) DataverseAddr() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DataverseAddr")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// DataverseAddr indicates an expected call of DataverseAddr.
+func (mr *MockQueryClientMockRecorder) DataverseAddr() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DataverseAddr", reflect.TypeOf((*MockQueryClient)(nil).DataverseAddr))
+}
+
+// DataverseInfo mocks base method.
+func (m *MockQueryClient) DataverseInfo(arg0 context.Context) (*dataverse.Info, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DataverseInfo", arg0)
+	ret0, _ := ret[0].(*dataverse.Info)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DataverseInfo indicates an expected call of DataverseInfo.
+func (mr *MockQueryClientMockRecorder) DataverseInfo(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DataverseInfo", reflect.TypeOf((*MockQueryClient)(nil).DataverseInfo), arg0)
 }
 
 // GetResourceGovAddr mocks base method.
