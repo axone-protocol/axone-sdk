@@ -1,5 +1,13 @@
 # Axone SDK changelog
 
+## [1.2.0](https://github.com/axone-protocol/axone-sdk/compare/v1.1.0...v1.2.0) (2025-04-11)
+
+
+### Features
+
+* **dataverse:** add support for retrieving cognitarium info ([1b75d45](https://github.com/axone-protocol/axone-sdk/commit/1b75d45a7d59566f67bd25436ca66579c2cdf8bd))
+* **dataverse:** add support for retrieving dataverse info ([a0b4896](https://github.com/axone-protocol/axone-sdk/commit/a0b48961ba3171491786817635bbdace703bb42c))
+
 ## [1.1.0](https://github.com/axone-protocol/axone-sdk/compare/v1.0.0...v1.1.0) (2025-04-05)
 
 
