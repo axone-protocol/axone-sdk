@@ -4,7 +4,7 @@
 TARGET_FOLDER = target
 
 # Docker images
-DOCKER_IMAGE_GOLANG    = golang:1.21-alpine3.17
+DOCKER_IMAGE_GOLANG    = golang:1.23-alpine3.31
 DOCKER_IMAGE_GOLANG_CI = golangci/golangci-lint:v2.0
 
 # Some colors
