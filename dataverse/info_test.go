@@ -29,8 +29,8 @@ func TestDataverseInfo(t *testing.T) {
 			},
 			queryError: nil,
 			expectedInfo: &dataverse.Info{
-				DataverseAddress: "axone1xt4ahzz2x8hpkc0tk6ekte9x6crw4w6u0r67cyt3kz9syh24pd7scvlt2w",
-				DataverseName:    "TestDataverse",
+				Address: "axone1xt4ahzz2x8hpkc0tk6ekte9x6crw4w6u0r67cyt3kz9syh24pd7scvlt2w",
+				Name:    "TestDataverse",
 			},
 			expectedErrMsg: "",
 		},

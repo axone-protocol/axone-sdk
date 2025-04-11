@@ -9,15 +9,15 @@ import (
 
 // Info is a struct that contains information about the dataverse.
 type Info struct {
-	// DataverseAddress is the address of the dataverse smart contract instance.
-	DataverseAddress string
-	// Name is the name of the dataverse
-	DataverseName string
+	// Address of the dataverse smart contract instance.
+	Address string
+	// Name of the dataverse
+	Name string
 }
 
 // CognitariumInfo holds information about the cognitarium instance.
 type CognitariumInfo struct {
-	// Address of the cognitarium smart contract.
+	// Address of the cognitarium smart contract instance.
 	Address string
 	// Owner (admin) of the cognitarium.
 	Owner string
@@ -43,8 +43,8 @@ func (c *queryClient) DataverseInfo(ctx context.Context) (*Info, error) {
 	}
 
 	return &Info{
-		DataverseAddress: c.dataverseContractAddr,
-		DataverseName:    resp.Name,
+		Address: c.dataverseContractAddr,
+		Name:    resp.Name,
 	}, nil
 }
 
