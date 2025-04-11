@@ -1,6 +1,6 @@
 package dataverse
 
-import cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
+import cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v6"
 
 var (
 	VcBodySubject = cgschema.IRI_Full("dataverse:credential:body#subject")

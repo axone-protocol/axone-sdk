@@ -3,7 +3,7 @@ package dataverse
 import (
 	"context"
 
-	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
+	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v6"
 )
 
 // Info is a struct that contains information about the dataverse.

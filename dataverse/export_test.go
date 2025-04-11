@@ -1,8 +1,8 @@
 package dataverse
 
 import (
-	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
-	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
+	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v6"
+	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v6"
 	"github.com/axone-protocol/axone-sdk/keys"
 	"github.com/axone-protocol/axone-sdk/tx"
 	"github.com/cosmos/cosmos-sdk/client"

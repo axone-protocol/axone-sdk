@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
-	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
+	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v6"
+	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v6"
 	"github.com/axone-protocol/axone-sdk/dataverse"
 	"github.com/axone-protocol/axone-sdk/testutil"
 	. "github.com/smartystreets/goconvey/convey"

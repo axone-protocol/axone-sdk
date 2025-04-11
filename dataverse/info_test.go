@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
+	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v6"
 	"github.com/axone-protocol/axone-sdk/dataverse"
 	"github.com/axone-protocol/axone-sdk/testutil"
 	. "github.com/smartystreets/goconvey/convey"

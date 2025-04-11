@@ -72,20 +72,6 @@ func (mr *MockQueryClientMockRecorder) AskGovTellAction(arg0, arg1, arg2, arg3 a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AskGovTellAction", reflect.TypeOf((*MockQueryClient)(nil).AskGovTellAction), arg0, arg1, arg2, arg3)
 }
 
-// DataverseAddr mocks base method.
-func (m *MockQueryClient) DataverseAddr() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DataverseAddr")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// DataverseAddr indicates an expected call of DataverseAddr.
-func (mr *MockQueryClientMockRecorder) DataverseAddr() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DataverseAddr", reflect.TypeOf((*MockQueryClient)(nil).DataverseAddr))
-}
-
 // DataverseInfo mocks base method.
 func (m *MockQueryClient) DataverseInfo(arg0 context.Context) (*dataverse.Info, error) {
 	m.ctrl.T.Helper()

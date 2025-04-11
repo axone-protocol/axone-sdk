@@ -3,7 +3,7 @@ package dataverse
 import (
 	"fmt"
 
-	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
+	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v6"
 )
 
 const W3IDPrefix = "https://w3id.org/axone/ontology/v4"
