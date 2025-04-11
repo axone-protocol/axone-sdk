@@ -30,7 +30,7 @@ func (t *txClient) SubmitClaims(ctx context.Context, vc *verifiable.Credential) 
 
 	msgExec := &wasmtypes.MsgExecuteContract{
 		Sender:   t.signer.Addr(),
-		Contract: t.contractAddr,
+		Contract: t.dataverseContractAddr,
 		Msg:      msg,
 		Funds:    nil,
 	}

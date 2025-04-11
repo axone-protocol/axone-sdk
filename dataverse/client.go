@@ -19,6 +19,9 @@ type QueryClient interface {
 	// DataverseInfo retrieves the dataverse information.
 	DataverseInfo(context.Context) (*Info, error)
 
+	// CognitariumInfo retrieves the cognitarium information.
+	CognitariumInfo(context.Context) (*CognitariumInfo, error)
+
 	// GetResourceGovAddr returns the governance address of a resource.
 	// It queries the cognitarium to get the governance address (law-stone contract address)
 	// of a resource. The resource is identified by its DID.
@@ -54,9 +57,11 @@ type LawStoneFactory func(string) (lsschema.QueryClient, error)
 var _ QueryClient = &queryClient{}
 
 type queryClient struct {
+	dataverseContractAddr   string
+	cognitariumContractAddr string
+
 	dataverseClient   dvschema.QueryClient
 	cognitariumClient cgschema.QueryClient
-	contractAddr      string
 	lawStoneFactory   LawStoneFactory
 }
 
@@ -81,9 +86,11 @@ func NewQueryClient(
 	}
 
 	return &queryClient{
+		contractAddr,
+		cognitariumAddr,
+
 		dataverseClient,
 		cognitariumClient,
-		contractAddr,
 		func(addr string) (lsschema.QueryClient, error) {
 			return lsschema.NewQueryClient(grpcAddr, addr, opts...)
 		},
