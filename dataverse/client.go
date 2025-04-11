@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
-	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v5"
-	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
+	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v6"
+	dvschema "github.com/axone-protocol/axone-contract-schema/go/dataverse-schema/v6"
+	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v6"
 	"github.com/axone-protocol/axone-sdk/keys"
 	"github.com/axone-protocol/axone-sdk/tx"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -18,6 +18,9 @@ import (
 type QueryClient interface {
 	// DataverseInfo retrieves the dataverse information.
 	DataverseInfo(context.Context) (*Info, error)
+
+	// CognitariumInfo retrieves the cognitarium information.
+	CognitariumInfo(context.Context) (*CognitariumInfo, error)
 
 	// GetResourceGovAddr returns the governance address of a resource.
 	// It queries the cognitarium to get the governance address (law-stone contract address)
@@ -54,9 +57,11 @@ type LawStoneFactory func(string) (lsschema.QueryClient, error)
 var _ QueryClient = &queryClient{}
 
 type queryClient struct {
+	dataverseContractAddr   string
+	cognitariumContractAddr string
+
 	dataverseClient   dvschema.QueryClient
 	cognitariumClient cgschema.QueryClient
-	contractAddr      string
 	lawStoneFactory   LawStoneFactory
 }
 
@@ -81,9 +86,11 @@ func NewQueryClient(
 	}
 
 	return &queryClient{
+		contractAddr,
+		cognitariumAddr,
+
 		dataverseClient,
 		cognitariumClient,
-		contractAddr,
 		func(addr string) (lsschema.QueryClient, error) {
 			return lsschema.NewQueryClient(grpcAddr, addr, opts...)
 		},

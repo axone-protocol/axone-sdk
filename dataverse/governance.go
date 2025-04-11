@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v5"
-	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v5"
+	cgschema "github.com/axone-protocol/axone-contract-schema/go/cognitarium-schema/v6"
+	lsschema "github.com/axone-protocol/axone-contract-schema/go/law-stone-schema/v6"
 )
 
 func (c *queryClient) GetResourceGovAddr(ctx context.Context, resourceDID string) (string, error) {
