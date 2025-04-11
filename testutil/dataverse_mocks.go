@@ -72,6 +72,21 @@ func (mr *MockQueryClientMockRecorder) AskGovTellAction(arg0, arg1, arg2, arg3 a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AskGovTellAction", reflect.TypeOf((*MockQueryClient)(nil).AskGovTellAction), arg0, arg1, arg2, arg3)
 }
 
+// CognitariumInfo mocks base method.
+func (m *MockQueryClient) CognitariumInfo(arg0 context.Context) (*dataverse.CognitariumInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CognitariumInfo", arg0)
+	ret0, _ := ret[0].(*dataverse.CognitariumInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CognitariumInfo indicates an expected call of CognitariumInfo.
+func (mr *MockQueryClientMockRecorder) CognitariumInfo(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CognitariumInfo", reflect.TypeOf((*MockQueryClient)(nil).CognitariumInfo), arg0)
+}
+
 // DataverseInfo mocks base method.
 func (m *MockQueryClient) DataverseInfo(arg0 context.Context) (*dataverse.Info, error) {
 	m.ctrl.T.Helper()

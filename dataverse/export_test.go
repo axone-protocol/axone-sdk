@@ -14,9 +14,10 @@ func NewDataverseQueryClient(
 	lawStoneFactory LawStoneFactory,
 ) QueryClient {
 	return &queryClient{
+		"axone1xt4ahzz2x8hpkc0tk6ekte9x6crw4w6u0r67cyt3kz9syh24pd7scvlt2w",
+		"axone1xa8wemfrzq03tkwqxnv9lun7rceec7wuhh8x3qjgxkaaj5fl50zsmj8u0n",
 		dataverseClient,
 		cognitariumClient,
-		"axone1xt4ahzz2x8hpkc0tk6ekte9x6crw4w6u0r67cyt3kz9syh24pd7scvlt2w",
 		lawStoneFactory,
 	}
 }
@@ -31,9 +32,10 @@ func NewDataverseTxClient(
 ) TxClient {
 	return &txClient{
 		queryClient: &queryClient{
+			"",
+			"",
 			dataverseClient,
 			cognitariumClient,
-			"",
 			lawStoneFactory,
 		},
 		txClient: client,
